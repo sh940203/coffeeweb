@@ -1,5 +1,6 @@
 import { Coffee } from "@/types/coffee";
 import CoffeeCard from "./CoffeeCard";
+import { StaggerContainer, StaggerItem } from "@/components/animations/Stagger";
 
 interface ProductGridProps {
     coffees: Coffee[];
@@ -16,10 +17,12 @@ export default function ProductGrid({ coffees }: ProductGridProps) {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+        <StaggerContainer className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
             {coffees.map((coffee) => (
-                <CoffeeCard key={coffee.id} coffee={coffee} />
+                <StaggerItem key={coffee.id}>
+                    <CoffeeCard coffee={coffee} />
+                </StaggerItem>
             ))}
-        </div>
+        </StaggerContainer>
     );
 }

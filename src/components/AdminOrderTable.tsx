@@ -40,37 +40,48 @@ export default function AdminOrderTable() {
 
     const fetchOrders = async () => {
         setLoading(true);
-        // Fetch orders with profiles (user email)
-        const { data: ordersData, error } = await supabase
-            .from("orders")
-            .select(`
-                *,
-                profiles:user_id (email)
-            `)
-            .order("created_at", { ascending: false });
+        try {
+            // 1. Fetch Orders (No complex joins first to avoid 400)
+            const { data: ordersData, error } = await supabase
+                .from("orders")
+                .select("*")
+                .order("created_at", { ascending: false });
 
-        if (error) {
-            console.error("Error fetching orders:", error);
+            if (error) throw error;
+
+            // 2. Fetch details (Items & Profiles) for each order
+            const ordersWithDetails = await Promise.all(ordersData.map(async (order: any) => {
+                // Fetch Items
+                const { data: itemsData } = await supabase
+                    .from("order_items")
+                    .select("*, coffee:coffees(name, image_url)")
+                    .eq("order_id", order.id);
+
+                // Fetch User Email (Manually to avoid join syntax issues)
+                let userEmail = 'Guest';
+                if (order.user_id) {
+                    const { data: profileData } = await supabase
+                        .from("profiles")
+                        .select("email")
+                        .eq("id", order.user_id)
+                        .single();
+                    if (profileData?.email) userEmail = profileData.email;
+                }
+
+                return {
+                    ...order,
+                    items: itemsData || [],
+                    user_email: userEmail
+                };
+            }));
+
+            setOrders(ordersWithDetails);
+        } catch (e: any) {
+            console.error("Error fetching orders:", e);
+            alert("讀取訂單失敗: " + (e.message || "Unknown error"));
+        } finally {
             setLoading(false);
-            return;
         }
-
-        // Fetch items for each order manually to ensure deep join works
-        const ordersWithItems = await Promise.all(ordersData.map(async (order: any) => {
-            const { data: itemsData } = await supabase
-                .from("order_items")
-                .select("*, coffee:coffees(name, image_url)")
-                .eq("order_id", order.id);
-
-            return {
-                ...order,
-                items: itemsData || [],
-                user_email: order.profiles?.email || 'Guest'
-            };
-        }));
-
-        setOrders(ordersWithItems);
-        setLoading(false);
     };
 
     const updateStatus = async (orderId: string, newStatus: string) => {
@@ -238,8 +249,8 @@ export default function AdminOrderTable() {
                                                         onClick={() => updateStatus(order.id, s)}
                                                         disabled={order.status === s}
                                                         className={`px-3 py-1 text-xs border rounded-sm transition-colors capitalize ${order.status === s
-                                                                ? getStatusColor(s) + ' border-transparent cursor-default'
-                                                                : 'border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900'
+                                                            ? getStatusColor(s) + ' border-transparent cursor-default'
+                                                            : 'border-gray-200 text-gray-600 hover:border-gray-400 hover:text-gray-900'
                                                             }`}
                                                     >
                                                         {s}

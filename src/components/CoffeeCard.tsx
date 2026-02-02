@@ -1,12 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import Image from "next/image";
+// ...
 import { Coffee } from "@/types/coffee";
 import { Coffee as CoffeeIcon, ShoppingCart, Check, AlertCircle, MessageSquareText } from "lucide-react";
 import { useCartStore } from "@/lib/CartStore";
 import { useState } from "react";
 import FlavorRadar from "./FlavorRadar";
 import ReviewSection from "./ReviewSection";
+import { motion } from "framer-motion";
+import WishlistButton from "./WishlistButton";
 
 interface CoffeeCardProps {
     coffee: Coffee;
@@ -29,9 +33,13 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
     const isLowStock = stock < 10 && stock > 0;
 
     return (
-        <div className="group flex flex-col h-full bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-300">
+        <motion.div
+            whileHover={{ y: -8 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className="group flex flex-col h-full bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+        >
             {/* Image Container 4:5 Aspect Ratio */}
-            <div className="relative w-full aspect-[4/5] bg-gray-100 overflow-hidden">
+            <Link href={`/products/${coffee.id}`} className="block relative w-full aspect-[4/5] bg-gray-100 overflow-hidden cursor-pointer">
                 {coffee.image_url ? (
                     <Image
                         src={coffee.image_url}
@@ -51,11 +59,17 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
                         <span className="bg-gray-800 text-white px-4 py-2 text-sm tracking-widest uppercase">已售罄</span>
                     </div>
                 )}
-            </div>
+
+                <div className="absolute top-2 right-2 z-20">
+                    <WishlistButton productId={coffee.id} className="bg-white/80 backdrop-blur-sm shadow-sm" />
+                </div>
+            </Link>
 
             {/* Content */}
             <div className="flex flex-col flex-grow p-6 text-center">
-                <h3 className="text-lg font-medium tracking-wide text-gray-900 mb-2">{coffee.name}</h3>
+                <Link href={`/products/${coffee.id}`}>
+                    <h3 className="text-lg font-medium tracking-wide text-gray-900 mb-2 hover:text-gray-600 transition-colors cursor-pointer">{coffee.name}</h3>
+                </Link>
 
                 <div className="text-xs text-gray-500 tracking-wider uppercase mb-4 space-x-2">
                     {coffee.origin && <span>{coffee.origin}</span>}
@@ -140,6 +154,6 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
                     )}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }

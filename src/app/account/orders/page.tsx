@@ -43,36 +43,46 @@ export default function MyOrdersPage() {
             }
 
             // Fetch orders
-            const { data: ordersData, error: ordersError } = await supabase
-                .from("orders")
-                .select("*")
-                .eq("user_id", session.user.id)
-                .order("created_at", { ascending: false });
+            try {
+                // Simplified query 
+                const { data: ordersData, error: ordersError } = await supabase
+                    .from("orders")
+                    .select("*")
+                    .eq("user_id", session.user.id)
+                    .order("created_at", { ascending: false });
 
-            if (ordersError) {
-                console.error("Error fetching orders:", ordersError);
+                if (ordersError) {
+                    console.error("MyOrders Page Error:", ordersError);
+                    setLoading(false);
+                    return;
+                }
+
+                if (!ordersData || ordersData.length === 0) {
+                    setOrders([]);
+                    setLoading(false);
+                    return;
+                }
+
+                // Fetch items for each order
+                const ordersWithItems = await Promise.all(ordersData.map(async (order) => {
+                    try {
+                        const { data: itemsData } = await supabase
+                            .from("order_items")
+                            .select("*, coffee:coffees(name, image_url)")
+                            .eq("order_id", order.id);
+                        return { ...order, items: itemsData || [] };
+                    } catch (e) {
+                        console.error(`Failed to fetch items for order ${order.id}`, e);
+                        return { ...order, items: [] };
+                    }
+                }));
+
+                setOrders(ordersWithItems);
+            } catch (err) {
+                console.error("Unexpected error in fetchOrders:", err);
+            } finally {
                 setLoading(false);
-                return;
             }
-
-            // Fetch items for each order (In a real app, maybe do this on expand or via robust query)
-            // ideally: .select('*, order_items(*, public.coffees(name, image_url))') if relationships are set
-            // Let's try deep select if foreign keys are correct.
-            // But we didn't set explicit FK name for 'coffee_id' to 'coffees' in setup_orders logic maybe?
-            // Let's try manual fetch loop for simplicity or a join if possible.
-
-            // Attempting deep join:
-            const ordersWithItems = await Promise.all(ordersData.map(async (order) => {
-                const { data: itemsData } = await supabase
-                    .from("order_items")
-                    .select("*, coffee:coffees(name, image_url)")
-                    .eq("order_id", order.id);
-
-                return { ...order, items: itemsData || [] };
-            }));
-
-            setOrders(ordersWithItems);
-            setLoading(false);
         };
 
         fetchOrders();

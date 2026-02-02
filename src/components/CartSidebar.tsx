@@ -1,17 +1,44 @@
 "use client";
 
 import { useCartStore } from "@/lib/CartStore";
-import { X, Minus, Plus, ShoppingCart, Truck, ArrowLeft, Trash2, ArrowRight, Check } from "lucide-react";
+import { X, Minus, Plus, ShoppingCart, Truck, ArrowLeft, Trash2, ArrowRight } from "lucide-react";
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import CheckoutModal from "./CheckoutModal";
+import CheckoutSuccessModal, { OrderDetail } from "./CheckoutSuccessModal";
 
 export default function CartSidebar() {
     const { isCartOpen, toggleCart, items, removeItem, updateQuantity, getTotalPrice, getFreeShippingProgress, clearCart } = useCartStore();
     const [userId, setUserId] = useState<string | null>(null);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
-    const [latestOrderId, setLatestOrderId] = useState<string | null>(null);
+    const [successOrder, setSuccessOrder] = useState<OrderDetail | null>(null);
+
+    // Touch gestures state
+    const [touchStart, setTouchStart] = useState<number | null>(null);
+    const [touchEnd, setTouchEnd] = useState<number | null>(null);
+    const minSwipeDistance = 50;
+
+    const onTouchStart = (e: React.TouchEvent) => {
+        setTouchEnd(null);
+        setTouchStart(e.targetTouches[0].clientX);
+    };
+
+    const onTouchMove = (e: React.TouchEvent) => {
+        setTouchEnd(e.targetTouches[0].clientX);
+    };
+
+    const onTouchEnd = () => {
+        if (!touchStart || !touchEnd) return;
+        const distance = touchStart - touchEnd;
+        const isLeftSwipe = distance > minSwipeDistance;
+        const isRightSwipe = distance < -minSwipeDistance;
+
+        // Cart is on the right, so swipe right (positive translateX) closes it
+        if (isRightSwipe) {
+            toggleCart();
+        }
+    };
 
     // Hydration fix & Auth Check
     const [isMounted, setIsMounted] = useState(false);
@@ -35,8 +62,19 @@ export default function CartSidebar() {
     const totalPrice = getTotalPrice();
     const { progress, remaining: freeShippingDiff } = getFreeShippingProgress();
 
-    const handleOrderSuccess = (orderId: string) => {
-        setLatestOrderId(orderId);
+    const handleOrderSuccess = async (orderId: string) => {
+        // Fetch full order details to display in success modal
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .eq('id', orderId)
+            .single();
+
+        if (data) {
+            setSuccessOrder(data);
+        } else {
+            console.error("Failed to fetch order details", error);
+        }
     };
 
     return (
@@ -51,7 +89,11 @@ export default function CartSidebar() {
                 {/* Sidebar Panel */}
                 <div
                     className={`absolute right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-xl flex flex-col h-full transform transition-transform duration-500 cubic-bezier(0.19, 1, 0.22, 1) ${isCartOpen ? 'translate-x-0' : 'translate-x-full'}`}
+                    onTouchStart={onTouchStart}
+                    onTouchMove={onTouchMove}
+                    onTouchEnd={onTouchEnd}
                 >
+
                     {/* Header */}
                     <div className="p-6 border-b border-gray-100 flex items-center justify-between bg-white z-10">
                         <h2 className="text-xl font-medium tracking-widest text-gray-900 flex items-center gap-2">
@@ -195,41 +237,14 @@ export default function CartSidebar() {
             />
 
             {/* Success Modal */}
-            {latestOrderId && (
-                <div className="fixed inset-0 z-[70] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-                    <div className="relative bg-white rounded-lg shadow-2xl w-full max-w-md p-8 text-center space-y-6 animate-in zoom-in-95 duration-300">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto text-green-600">
-                            <Check className="w-8 h-8" />
-                        </div>
-                        <div className="space-y-2">
-                            <h2 className="text-2xl font-bold text-gray-900">下單成功！</h2>
-                            <p className="text-gray-600">感謝您的訂購，我們會盡快為您烘焙。</p>
-                        </div>
-
-                        <div className="bg-gray-50 p-4 rounded-md text-left space-y-3 border border-gray-100">
-                            <p className="text-sm text-gray-500">訂單編號：</p>
-                            <p className="font-mono font-medium text-gray-900 select-all">{latestOrderId}</p>
-                            <hr className="border-gray-200" />
-                            <p className="text-sm text-gray-500">匯款帳號 (822 中國信託)：</p>
-                            <p className="font-mono font-bold text-lg text-gray-900 select-all">9015-4033-2201</p>
-                            <p className="text-xs text-red-500 mt-1">* 請於匯款後至「歷史訂單」回報後五碼</p>
-                        </div>
-
-                        <div className="pt-2">
-                            <button
-                                onClick={() => {
-                                    setLatestOrderId(null);
-                                    toggleCart(); // Close cart
-                                }}
-                                className="w-full bg-gray-900 text-white py-3 rounded-sm font-medium hover:bg-gray-800 transition-colors"
-                            >
-                                好的，我知道了
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <CheckoutSuccessModal
+                isOpen={!!successOrder}
+                onClose={() => {
+                    setSuccessOrder(null);
+                    toggleCart();
+                }}
+                order={successOrder}
+            />
         </>
     );
 }

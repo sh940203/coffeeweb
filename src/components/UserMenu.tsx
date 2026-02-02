@@ -35,14 +35,20 @@ export default function UserMenu() {
     }, []);
 
     const checkAdmin = async (userId: string) => {
-        const { data } = await supabase
-            .from("profiles")
-            .select("role")
-            .eq("id", userId)
-            .single();
+        try {
+            const { data, error } = await supabase
+                .from("profiles")
+                .select("role")
+                .eq("id", userId)
+                .single();
 
-        if (data && data.role === 'admin') {
-            setIsAdmin(true);
+            if (data && data.role === 'admin') {
+                setIsAdmin(true);
+            } else {
+                setIsAdmin(false);
+            }
+        } catch (e) {
+            console.error("Check Admin Exception:", e);
         }
     };
 

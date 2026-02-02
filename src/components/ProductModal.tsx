@@ -5,35 +5,31 @@ import { X, Loader2, Save, Upload } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Image from "next/image";
 
-interface Coffee {
+export interface ModalCoffee {
     id?: string;
     name: string;
-    origin: string;
-    process: string;
-    roast_level: string;
-    flavor: string;
-    features: string;
-    price_display: string; // Store as string "NT$ 450" for display consistency, or change to number in DB? 
-    // DB schema says 'price_display' TEXT. But order system parses number.
-    // Let's keep it robust. Input as number, format on save?
-    // Actually, AdminProductTable uses `price_half_lb: number`. 
-    // Let's correct the Interface to match DB Schema: `price_display` (TEXT).
+    origin?: string;
+    process?: string;
+    roast_level?: string;
+    flavor?: string;
+    features?: string;
+    price_display?: string;
     stock: number;
-    image_url: string;
+    image_url?: string;
     is_available: boolean;
 }
 
 interface ProductModalProps {
     isOpen: boolean;
     onClose: () => void;
-    coffee: Coffee | null; // null = new
+    coffee: ModalCoffee | null; // null = new
     onSave: () => void;
 }
 
 export default function ProductModal({ isOpen, onClose, coffee, onSave }: ProductModalProps) {
     const [isLoading, setIsLoading] = useState(false);
     const [isUploading, setIsUploading] = useState(false);
-    const [formData, setFormData] = useState<Coffee>({
+    const [formData, setFormData] = useState<ModalCoffee>({
         name: "",
         origin: "",
         process: "水洗 Washed",
@@ -50,7 +46,16 @@ export default function ProductModal({ isOpen, onClose, coffee, onSave }: Produc
     useEffect(() => {
         if (isOpen) {
             if (coffee) {
-                setFormData(coffee);
+                setFormData({
+                    ...coffee,
+                    origin: coffee.origin || "",
+                    process: coffee.process || "水洗 Washed",
+                    roast_level: coffee.roast_level || "中烘焙 Medium Roast",
+                    flavor: coffee.flavor || "",
+                    features: coffee.features || "",
+                    price_display: coffee.price_display || "NT$ ",
+                    image_url: coffee.image_url || ""
+                });
             } else {
                 setFormData({
                     name: "",

@@ -4,6 +4,7 @@ import ProductGrid from "@/components/ProductGrid";
 import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import { supabase } from "@/lib/supabase";
+import FadeIn from "@/components/animations/FadeIn";
 import { Coffee } from "@/types/coffee";
 
 // This is a Server Component by default
@@ -35,22 +36,26 @@ export default async function Home() {
     <div className="min-h-screen flex flex-col">
       <Navbar />
 
-      <HeroSection />
+      <FadeIn className="w-full">
+        <HeroSection />
+      </FadeIn>
 
       <main id="shop" className="flex-grow container mx-auto px-6 md:px-12 py-24 w-full max-w-7xl scroll-mt-20">
-        <div className="mb-16 text-center space-y-4">
+        <FadeIn delay={0.2} className="mb-16 text-center space-y-4">
           <h1 className="text-3xl md:text-3xl font-light tracking-[0.2em] text-[#333333]">
             當季豆單
           </h1>
           <p className="text-xs text-gray-400 tracking-[0.3em] font-light uppercase">
             Seasonal Selection
           </p>
-        </div>
+        </FadeIn>
 
         <ProductGrid coffees={productList} />
       </main>
 
-      <AboutSection />
+      <FadeIn delay={0.2} direction="up">
+        <AboutSection />
+      </FadeIn>
 
       <Footer />
     </div>
