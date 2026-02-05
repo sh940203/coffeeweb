@@ -27,9 +27,8 @@ export default async function Home() {
   // Handle null data and map DB fields to Frontend Type
   const productList: Coffee[] = (coffees || []).map((c: any) => ({
     ...c,
-    process: c.processing_method,
-    flavor: c.flavor_notes,
-    price_display: c.price_half_lb ? `NT$${c.price_half_lb}` : '未定價',
+    // Using DB columns directly: process, flavor, price_display are already correct
+    price_display: c.price_display || (c.price_half_lb ? `NT$${c.price_half_lb}` : '未定價'),
   }));
 
   return (
