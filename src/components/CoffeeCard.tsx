@@ -11,6 +11,7 @@ import FlavorRadar from "./FlavorRadar";
 import ReviewSection from "./ReviewSection";
 import { motion } from "framer-motion";
 import WishlistButton from "./WishlistButton";
+import { toast } from "sonner";
 
 interface CoffeeCardProps {
     coffee: Coffee;
@@ -23,6 +24,7 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
 
     const handleAddToCart = () => {
         addItem(coffee);
+        toast.success(`${coffee.name} 已加入購物車`);
         setAdded(true);
         setTimeout(() => setAdded(false), 2000);
     };

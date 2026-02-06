@@ -5,6 +5,7 @@ import { X, Minus, Plus, ShoppingCart, Truck, ArrowLeft, Trash2, ArrowRight } fr
 import { useState, useEffect } from "react";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
+import Link from "next/link";
 import CheckoutModal from "./CheckoutModal";
 import CheckoutSuccessModal, { OrderDetail } from "./CheckoutSuccessModal";
 
@@ -208,13 +209,14 @@ export default function CartSidebar() {
                                     <span className="text-green-600 font-medium">已達免運門檻</span>
                                 )}
                             </div>
-                            <button
-                                onClick={() => setIsCheckoutOpen(true)}
+                            <Link
+                                href="/cart"
+                                onClick={toggleCart} // Close sidebar when navigating
                                 className="w-full flex items-center justify-center gap-2 rounded-sm border border-transparent bg-gray-900 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-all active:scale-[0.98]"
                             >
-                                前往結帳
+                                前往購物車確認
                                 <ArrowRight className="w-4 h-4" />
-                            </button>
+                            </Link>
                             <div className="flex justify-center">
                                 <button
                                     type="button"

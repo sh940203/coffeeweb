@@ -40,10 +40,10 @@ export const useCartStore = create<CartState>()(
                                     ? { ...item, quantity: item.quantity + 1 }
                                     : item
                             ),
-                            isCartOpen: true,
+                            // isCartOpen: true, // Don't auto open
                         };
                     }
-                    return { items: [...state.items, { ...product, quantity: 1 }], isCartOpen: true };
+                    return { items: [...state.items, { ...product, quantity: 1 }] }; // Don't auto open
                 });
             },
 

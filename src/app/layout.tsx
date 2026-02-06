@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Serif_TC } from "next/font/google";
 import "./globals.css";
 import CartSidebar from "@/components/CartSidebar";
+import { Toaster } from "sonner";
 
 const notoSerifTC = Noto_Serif_TC({
     variable: "--font-noto-serif",
@@ -27,6 +28,7 @@ export default function RootLayout({
             >
                 {children}
                 <CartSidebar />
+                <Toaster position="top-center" richColors />
             </body>
         </html>
     );

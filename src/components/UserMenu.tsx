@@ -71,9 +71,17 @@ export default function UserMenu() {
                     <div className="relative">
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
-                            className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-700"
+                            className="flex items-center gap-2 p-1 pr-3 hover:bg-gray-50 rounded-full transition-all border border-transparent hover:border-gray-200 group"
                         >
-                            <User className="w-7 h-7" />
+                            <div className="relative">
+                                <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-500 group-hover:bg-gray-200 transition-colors">
+                                    <User className="w-4 h-4" />
+                                </div>
+                                <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
+                            </div>
+                            <span className="text-xs font-medium text-gray-700 max-w-[100px] truncate">
+                                {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                            </span>
                         </button>
 
                         {/* Dropdown Menu */}

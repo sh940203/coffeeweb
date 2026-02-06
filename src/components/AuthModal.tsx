@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import { X, Mail, Lock, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -28,7 +28,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
     const [successMsg, setSuccessMsg] = useState<string | null>(null);
     const [showPassword, setShowPassword] = useState(false);
 
-    if (!isOpen) return null;
+    // Moved early return to after hooks to satisfy React Hook Rules
 
     // Reset state when switching modes
     const resetState = () => {
@@ -37,6 +37,20 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         setLoading(false);
         // Don't clear inputs to be friendly
     };
+
+    // Lock body scroll when modal is open
+    useEffect(() => {
+        if (isOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [isOpen]);
+
+    if (!isOpen) return null;
 
     // Password Validation Rules
     const checkPassword = (pwd: string) => {
