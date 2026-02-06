@@ -23,21 +23,31 @@ export default function CartPage() {
 
     if (items.length === 0) {
         return (
-            <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center bg-gray-50">
-                <div className="bg-white p-12 rounded-lg shadow-sm text-center max-w-md w-full mx-4">
-                    <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
-                        <ArrowLeft className="w-8 h-8" />
+            <>
+                <CheckoutSuccessModal
+                    isOpen={!!successOrder}
+                    onClose={() => {
+                        setSuccessOrder(null);
+                        window.location.href = "/";
+                    }}
+                    order={successOrder}
+                />
+                <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center bg-gray-50">
+                    <div className="bg-white p-12 rounded-lg shadow-sm text-center max-w-md w-full mx-4">
+                        <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
+                            <ArrowLeft className="w-8 h-8" />
+                        </div>
+                        <h1 className="text-2xl font-medium text-gray-900 mb-2">購物車是空的</h1>
+                        <p className="text-gray-500 mb-8">看起來您還沒有加入任何咖啡豆。</p>
+                        <Link
+                            href="/"
+                            className="inline-flex items-center justify-center px-8 py-3 bg-gray-900 text-white text-sm tracking-widest hover:bg-gray-800 transition-colors rounded-sm"
+                        >
+                            前往選購
+                        </Link>
                     </div>
-                    <h1 className="text-2xl font-medium text-gray-900 mb-2">購物車是空的</h1>
-                    <p className="text-gray-500 mb-8">看起來您還沒有加入任何咖啡豆。</p>
-                    <Link
-                        href="/"
-                        className="inline-flex items-center justify-center px-8 py-3 bg-gray-900 text-white text-sm tracking-widest hover:bg-gray-800 transition-colors rounded-sm"
-                    >
-                        前往選購
-                    </Link>
                 </div>
-            </div>
+            </>
         );
     }
 
