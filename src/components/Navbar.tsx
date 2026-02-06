@@ -36,8 +36,8 @@ export default function Navbar() {
                 {/* Center: Navigation Links (Desktop) */}
                 <div className="hidden md:flex items-center gap-8 text-sm tracking-[0.15em] font-medium text-gray-500 absolute left-1/2 transform -translate-x-1/2">
                     <Link href="/" className="hover:text-gray-900 transition-colors">首頁</Link>
-                    <Link href="#shop" className="hover:text-gray-900 transition-colors">挑選咖啡</Link>
-                    <Link href="#about" className="hover:text-gray-900 transition-colors">關於我們</Link>
+                    <Link href="/#shop" className="hover:text-gray-900 transition-colors">挑選咖啡</Link>
+                    <Link href="/#about" className="hover:text-gray-900 transition-colors">關於我們</Link>
                     <Link href="/account/orders" className="hover:text-gray-900 transition-colors">歷史訂單</Link>
                 </div>
 
@@ -72,14 +72,14 @@ export default function Navbar() {
                             首頁
                         </Link>
                         <Link
-                            href="#shop"
+                            href="/#shop"
                             className="text-gray-700 hover:text-gray-900 py-2 border-b border-gray-50 text-sm tracking-widest"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
                             挑選咖啡
                         </Link>
                         <Link
-                            href="#about"
+                            href="/#about"
                             className="text-gray-700 hover:text-gray-900 py-2 border-b border-gray-50 text-sm tracking-widest"
                             onClick={() => setIsMobileMenuOpen(false)}
                         >
