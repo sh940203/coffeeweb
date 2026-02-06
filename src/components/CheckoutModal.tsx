@@ -5,10 +5,12 @@ import { X, Truck, CreditCard, ArrowRight, Loader2 } from "lucide-react";
 import { useCartStore } from "@/lib/CartStore";
 import { supabase } from "@/lib/supabase";
 
+import { OrderDetail } from "./CheckoutSuccessModal";
+
 interface CheckoutModalProps {
     isOpen: boolean;
     onClose: () => void;
-    onSuccess: (orderId: string) => void;
+    onSuccess: (order: OrderDetail) => void;
 }
 
 export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps) {
@@ -161,9 +163,20 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
 
             console.log("Order created:", data);
 
-            // 4. Success
+            // 4. Success - Construct OrderDetail from form data to avoid RLS fetch issues
+            const successOrder: OrderDetail = {
+                id: data?.order_id || data?.id || "ORDER_ID", // Fallback if RPC return varies
+                created_at: new Date().toISOString(),
+                total_amount: grandTotal,
+                status: 'PENDING',
+                recipient_name: formData.name,
+                recipient_phone: formData.phone,
+                recipient_address: finalAddress + (formData.note ? ` (備註: ${formData.note})` : ""),
+                items: items, // Pass current cart items
+            };
+
             clearCart();
-            onSuccess(data.order_id);
+            onSuccess(successOrder);
             onClose();
 
         } catch (error) {

@@ -17,16 +17,8 @@ export default function CartPage() {
     const totalPrice = getTotalPrice();
     const { progress, remaining: freeShippingDiff } = getFreeShippingProgress();
 
-    const handleOrderSuccess = async (orderId: string) => {
-        const { data, error } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('id', orderId)
-            .single();
-
-        if (data) {
-            setSuccessOrder(data);
-        }
+    const handleOrderSuccess = (order: OrderDetail) => {
+        setSuccessOrder(order);
     };
 
     if (items.length === 0) {

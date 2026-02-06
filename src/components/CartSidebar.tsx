@@ -63,19 +63,8 @@ export default function CartSidebar() {
     const totalPrice = getTotalPrice();
     const { progress, remaining: freeShippingDiff } = getFreeShippingProgress();
 
-    const handleOrderSuccess = async (orderId: string) => {
-        // Fetch full order details to display in success modal
-        const { data, error } = await supabase
-            .from('orders')
-            .select('*')
-            .eq('id', orderId)
-            .single();
-
-        if (data) {
-            setSuccessOrder(data);
-        } else {
-            console.error("Failed to fetch order details", error);
-        }
+    const handleOrderSuccess = (order: OrderDetail) => {
+        setSuccessOrder(order);
     };
 
     return (
