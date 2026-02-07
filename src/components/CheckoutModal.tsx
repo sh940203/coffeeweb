@@ -16,6 +16,7 @@ interface CheckoutModalProps {
 export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutModalProps) {
     const { items, getTotalPrice, clearCart } = useCartStore();
     const [isLoading, setIsLoading] = useState(false);
+    const [paymentMethod, setPaymentMethod] = useState<'ATM' | 'ECPAY'>('ATM');
 
     // Touch gestures state
     const [touchStart, setTouchStart] = useState<number | null>(null);
@@ -160,19 +161,60 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
             });
 
             if (error) throw error;
-
             console.log("Order created:", data);
 
-            // 4. Success - Construct OrderDetail from form data to avoid RLS fetch issues
+            // Handle ECPay Logic
+            if (paymentMethod === 'ECPAY') {
+                const orderId = data?.order_id || data?.id;
+
+                // Call internal API to sign data
+                const res = await fetch('/api/ecpay', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        orderId,
+                        amount: grandTotal,
+                        itemName: "Coffee Order",
+                        recipientEmail: user?.email // Optional
+                    })
+                });
+
+                if (!res.ok) throw new Error("Failed to prepare ECPay payment");
+
+                const ecpayData = await res.json();
+
+                // Create form and submit
+                const form = document.createElement('form');
+                form.method = 'POST';
+                form.action = ecpayData.action; // https://payment-stage.ecpay.com.tw/...
+
+                for (const [key, value] of Object.entries(ecpayData.params)) {
+                    const input = document.createElement('input');
+                    input.type = 'hidden';
+                    input.name = key;
+                    input.value = value as string;
+                    form.appendChild(input);
+                }
+
+                document.body.appendChild(form);
+                form.submit();
+                // Don't close modal or clear cart immediately, user is redirecting.
+                // Or maybe clear cart? Ideally clear cart AFTER successful payment callback.
+                // optimizing: clear cart now to prevent double order if they go back?
+                clearCart();
+                return;
+            }
+
+            // 4. Success (ATM / Manual)
             const successOrder: OrderDetail = {
-                id: data?.order_id || data?.id || "ORDER_ID", // Fallback if RPC return varies
+                id: data?.order_id || data?.id || "ORDER_ID",
                 created_at: new Date().toISOString(),
                 total_amount: grandTotal,
                 status: 'PENDING',
                 recipient_name: formData.name,
                 recipient_phone: formData.phone,
                 recipient_address: finalAddress + (formData.note ? ` (備註: ${formData.note})` : ""),
-                items: items, // Pass current cart items
+                items: items,
             };
 
             clearCart();
@@ -182,7 +224,6 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
         } catch (error) {
             console.error("Checkout failed:", error);
             alert("結帳發生錯誤，請稍後再試。");
-        } finally {
             setIsLoading(false);
         }
     };
@@ -241,18 +282,56 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
                         </div>
 
                         {/* Payment Info */}
-                        <div className="bg-blue-50 p-4 rounded-md border border-blue-100 flex gap-3">
-                            <div className="mt-1">
-                                <CreditCard className="w-5 h-5 text-blue-600" />
+                        {/* Payment Info */}
+                        <div className="space-y-3">
+                            <label className="block text-sm font-medium text-gray-700">付款方式</label>
+                            <div className="grid grid-cols-2 gap-3">
+                                <button
+                                    type="button"
+                                    onClick={() => setPaymentMethod('ATM')}
+                                    className={`py-3 px-4 border rounded-md text-sm font-medium transition-all flex items-center justify-center gap-2 ${paymentMethod === 'ATM'
+                                        ? 'border-blue-500 bg-blue-50 text-blue-700 ring-1 ring-blue-500'
+                                        : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                                        }`}
+                                >
+                                    <CreditCard className="w-4 h-4" />
+                                    ATM / 匯款
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => setPaymentMethod('ECPAY')}
+                                    className={`py-3 px-4 border rounded-md text-sm font-medium transition-all flex items-center justify-center gap-2 ${paymentMethod === 'ECPAY'
+                                        ? 'border-green-500 bg-green-50 text-green-700 ring-1 ring-green-500'
+                                        : 'border-gray-200 hover:border-gray-300 text-gray-600'
+                                        }`}
+                                >
+                                    <div className="w-4 h-4 bg-green-600 text-white text-[10px] flex items-center justify-center rounded-full font-bold">E</div>
+                                    綠界支付
+                                </button>
                             </div>
-                            <div>
-                                <h3 className="font-bold text-blue-900 text-sm">付款方式：ATM 轉帳 / 銀行匯款</h3>
-                                <p className="text-xs text-blue-700 mt-1 leading-relaxed">
-                                    下單完成後系統會提供匯款帳號。
-                                    <br />
-                                    請於 3 日內完成匯款，並回傳帳號後五碼。
-                                </p>
-                            </div>
+
+                            {paymentMethod === 'ATM' && (
+                                <div className="bg-blue-50 p-4 rounded-md border border-blue-100 flex gap-3 text-sm">
+                                    <div className="text-blue-800">
+                                        <p className="font-bold mb-1">匯款資訊：</p>
+                                        <p>銀行：000 測試銀行</p>
+                                        <p>帳號：1234-5678-9012-3456</p>
+                                        <p className="text-xs mt-2 text-blue-600">請於 3 日內完成匯款。</p>
+                                    </div>
+                                </div>
+                            )}
+
+                            {paymentMethod === 'ECPAY' && (
+                                <div className="bg-green-50 p-4 rounded-md border border-green-100 flex gap-3 text-sm">
+                                    <div className="text-green-800">
+                                        <p className="font-bold mb-1">綠界科技 ECPay (測試環境)</p>
+                                        <p className="text-xs">支援信用卡、網路 ATM、超商代碼繳費。</p>
+                                        <p className="text-xs mt-2 text-green-600">
+                                            點擊「確認下單」後將跳轉至綠界支付頁面。
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         {/* Shipping Form */}

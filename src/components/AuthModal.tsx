@@ -95,7 +95,7 @@ export default function AuthModal() {
                 });
                 if (error) throw error;
                 onClose(); // Close on success
-                window.location.reload(); // Reload to refresh session state
+                onClose(); // Close on success
             } else {
                 const { data, error } = await supabase.auth.signUp({
                     email,
@@ -109,7 +109,6 @@ export default function AuthModal() {
                     setSuccessMsg("註冊成功！已為您自動登入。");
                     setTimeout(() => {
                         onClose();
-                        window.location.reload();
                     }, 1500);
                 }
             }
@@ -147,7 +146,7 @@ export default function AuthModal() {
                 if (error) throw error;
 
                 onClose();
-                window.location.reload();
+                onClose();
             }
         } catch (err: any) {
             console.error(err);

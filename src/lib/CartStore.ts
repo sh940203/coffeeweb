@@ -22,7 +22,7 @@ interface CartState {
     getFreeShippingProgress: () => { current: number; threshold: number; remaining: number; progress: number };
 }
 
-const FREE_SHIPPING_THRESHOLD = 2000;
+const FREE_SHIPPING_THRESHOLD = 3000;
 
 export const useCartStore = create<CartState>()(
     persist(

@@ -13,9 +13,49 @@ export default function UserMenu() {
     const { openAuthModal } = useAuthStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
+    useEffect(() => {
+        // 1. Get initial session
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            console.log("UserMenu: Initial session check", session?.user?.email);
+            setUser(session?.user ?? null);
+            if (session?.user) checkAdmin(session.user.id);
+        });
+
+        // 2. Listen for changes
+        const {
+            data: { subscription },
+        } = supabase.auth.onAuthStateChange((_event, session) => {
+            console.log("UserMenu: Auth state change", _event, session?.user?.email);
+            setUser(session?.user ?? null);
+            if (session?.user) {
+                checkAdmin(session.user.id);
+            } else {
+                setIsAdmin(false);
+            }
+        });
+
+        return () => subscription.unsubscribe();
+    }, []);
+
+    const checkAdmin = async (userId: string) => {
+        try {
+            const { data } = await supabase
+                .from('admins') // Assuming you have an 'admins' table
+                .select('user_id')
+                .eq('user_id', userId)
+                .single();
+            setIsAdmin(!!data);
+        } catch (error) {
+            console.error('Error checking admin status:', error);
+            setIsAdmin(false);
+        }
+    };
+
     const handleLogout = async () => {
         await supabase.auth.signOut();
         setIsMenuOpen(false);
+        setUser(null);
+        setIsAdmin(false);
         window.location.href = "/";
     };
 
