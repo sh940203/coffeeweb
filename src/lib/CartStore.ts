@@ -11,7 +11,7 @@ interface CartState {
     isCartOpen: boolean;
 
     // Actions
-    addItem: (product: Coffee) => void;
+    addItem: (product: Coffee, quantity?: number) => void;
     removeItem: (productId: string) => void;
     updateQuantity: (productId: string, quantity: number) => void;
     clearCart: () => void;
@@ -30,20 +30,19 @@ export const useCartStore = create<CartState>()(
             items: [],
             isCartOpen: false,
 
-            addItem: (product) => {
+            addItem: (product: Coffee, quantity: number = 1) => {
                 set((state) => {
                     const existingItem = state.items.find((item) => item.id === product.id);
                     if (existingItem) {
                         return {
                             items: state.items.map((item) =>
                                 item.id === product.id
-                                    ? { ...item, quantity: item.quantity + 1 }
+                                    ? { ...item, quantity: item.quantity + quantity }
                                     : item
                             ),
-                            // isCartOpen: true, // Don't auto open
                         };
                     }
-                    return { items: [...state.items, { ...product, quantity: 1 }] }; // Don't auto open
+                    return { items: [...state.items, { ...product, quantity: quantity }] };
                 });
             },
 

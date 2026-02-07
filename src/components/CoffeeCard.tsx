@@ -19,20 +19,32 @@ interface CoffeeCardProps {
 
 export default function CoffeeCard({ coffee }: CoffeeCardProps) {
     const { addItem } = useCartStore();
+    const [quantity, setQuantity] = useState(1);
     const [added, setAdded] = useState(false);
     const [showReviews, setShowReviews] = useState(false);
-
-    const handleAddToCart = () => {
-        addItem(coffee);
-        toast.success(`${coffee.name} 已加入購物車`);
-        setAdded(true);
-        setTimeout(() => setAdded(false), 2000);
-    };
 
     // Stock Logic
     const stock = coffee.stock ?? 10;
     const isOutOfStock = stock <= 0 || !coffee.is_available;
     const isLowStock = stock < 10 && stock > 0;
+
+    const handleIncrement = () => {
+        if (stock > quantity) setQuantity(q => q + 1);
+    };
+
+    const handleDecrement = () => {
+        if (quantity > 1) setQuantity(q => q - 1);
+    };
+
+    const handleAddToCart = () => {
+        addItem(coffee, quantity);
+        toast.success(`${coffee.name} (x${quantity}) 已加入購物車`);
+        setAdded(true);
+        setTimeout(() => setAdded(false), 2000);
+        setQuantity(1); // Reset after adding
+    };
+
+    // ... (Stock Logic remains same) ...
 
     return (
         <motion.div
@@ -117,26 +129,48 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
                             暫不販售
                         </button>
                     ) : (
-                        <button
-                            onClick={handleAddToCart}
-                            disabled={added}
-                            className={`inline-flex items-center justify-center gap-2 w-full py-3 text-sm tracking-widest transition-all duration-300 ${added
-                                ? 'bg-green-600 text-white hover:bg-green-700'
-                                : 'bg-gray-900 text-white hover:bg-gray-700'
-                                }`}
-                        >
-                            {added ? (
-                                <>
-                                    <Check className="w-4 h-4" />
-                                    <span>已加入</span>
-                                </>
-                            ) : (
-                                <>
-                                    <ShoppingCart className="w-5 h-5" />
-                                    <span>加入購物車</span>
-                                </>
-                            )}
-                        </button>
+                        <div className="flex gap-3">
+                            {/* Quantity Selector */}
+                            <div className="flex items-center border border-gray-200 rounded-sm">
+                                <button
+                                    onClick={handleDecrement}
+                                    disabled={quantity <= 1}
+                                    className="px-3 py-3 hover:bg-gray-50 text-gray-500 disabled:text-gray-300 transition-colors"
+                                >
+                                    -
+                                </button>
+                                <span className="w-8 text-center text-sm font-medium text-gray-900">{quantity}</span>
+                                <button
+                                    onClick={handleIncrement}
+                                    disabled={quantity >= stock}
+                                    className="px-3 py-3 hover:bg-gray-50 text-gray-500 disabled:text-gray-300 transition-colors"
+                                >
+                                    +
+                                </button>
+                            </div>
+
+                            {/* Add Button */}
+                            <button
+                                onClick={handleAddToCart}
+                                disabled={added}
+                                className={`flex-1 inline-flex items-center justify-center gap-2 py-3 text-sm tracking-widest transition-all duration-300 ${added
+                                    ? 'bg-green-600 text-white hover:bg-green-700'
+                                    : 'bg-gray-900 text-white hover:bg-gray-700'
+                                    }`}
+                            >
+                                {added ? (
+                                    <>
+                                        <Check className="w-4 h-4" />
+                                        <span>已加入</span>
+                                    </>
+                                ) : (
+                                    <>
+                                        <ShoppingCart className="w-4 h-4" />
+                                        <span>加入</span>
+                                    </>
+                                )}
+                            </button>
+                        </div>
                     )}
                 </div>
 
@@ -155,7 +189,7 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
                         </div>
                     )}
                 </div>
-            </div>
-        </motion.div>
+            </div >
+        </motion.div >
     );
 }
