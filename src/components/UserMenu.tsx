@@ -13,7 +13,11 @@ export default function UserMenu() {
     const { openAuthModal } = useAuthStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // ... (useEffect remains same) ...
+    const handleLogout = async () => {
+        await supabase.auth.signOut();
+        setIsMenuOpen(false);
+        window.location.href = "/";
+    };
 
     return (
         <>
