@@ -4,7 +4,7 @@ import { useEffect, useState, use } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import { Coffee } from "@/types/coffee";
+import { Coffee } from "@/types/index";
 import { useCartStore } from "@/lib/CartStore";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";

@@ -1,4 +1,4 @@
-import { Coffee } from "@/types/coffee";
+import { Coffee } from "@/types/index";
 import CoffeeCard from "./CoffeeCard";
 import { StaggerContainer, StaggerItem } from "@/components/animations/Stagger";
 

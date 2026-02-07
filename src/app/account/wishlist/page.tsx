@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Coffee } from "@/types/coffee";
+import { Coffee } from "@/types/index";
 import ProductGrid from "@/components/ProductGrid";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";

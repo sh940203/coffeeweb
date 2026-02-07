@@ -5,7 +5,7 @@ import HeroSection from "@/components/HeroSection";
 import AboutSection from "@/components/AboutSection";
 import { supabase } from "@/lib/supabase";
 import FadeIn from "@/components/animations/FadeIn";
-import { Coffee } from "@/types/coffee";
+import { Coffee } from "@/types/index";
 
 // This is a Server Component by default
 export const revalidate = 60; // Revalidate every 60 seconds
