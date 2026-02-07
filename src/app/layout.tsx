@@ -16,6 +16,8 @@ export const metadata: Metadata = {
     description: "用心烘焙每一顆咖啡豆，帶給您最純粹的風味。",
 };
 
+import AuthModal from "@/components/AuthModal";
+
 export default function RootLayout({
     children,
 }: Readonly<{
@@ -28,6 +30,7 @@ export default function RootLayout({
             >
                 {children}
                 <CartSidebar />
+                <AuthModal />
                 <Toaster position="top-center" richColors />
             </body>
         </html>

@@ -5,13 +5,16 @@ import { supabase } from "@/lib/supabase";
 import { X, Mail, Lock, CheckCircle, AlertCircle, Eye, EyeOff } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface AuthModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-}
+import { useAuthStore } from "@/lib/AuthStore";
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
-    const [isLogin, setIsLogin] = useState(true);
+export default function AuthModal() {
+    const { isAuthModalOpen, closeAuthModal, authView, setAuthView } = useAuthStore();
+    const isOpen = isAuthModalOpen;
+    const onClose = closeAuthModal;
+
+    // Internal state mapping to store
+    const isLogin = authView === 'login';
+    const setIsLogin = (login: boolean) => setAuthView(login ? 'login' : 'register');
     const [authMethod, setAuthMethod] = useState<'email' | 'phone'>('email'); // Toggle between Email and Phone
 
     // Email State

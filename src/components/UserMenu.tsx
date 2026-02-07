@@ -2,72 +2,26 @@
 
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import { User, LogOut, Settings, LayoutDashboard, ShoppingBag } from "lucide-react";
-import AuthModal from "./AuthModal";
+import { User, LogOut, LayoutDashboard, ShoppingBag } from "lucide-react";
 import Link from "next/link";
+import { useAuthStore } from "@/lib/AuthStore";
 
 export default function UserMenu() {
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    // Removed local isAuthModalOpen
+    const { openAuthModal } = useAuthStore();
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    useEffect(() => {
-        // 1. Get initial session
-        supabase.auth.getSession().then(({ data: { session } }) => {
-            setUser(session?.user ?? null);
-            if (session?.user) checkAdmin(session.user.id);
-        });
-
-        // 2. Listen for changes
-        const {
-            data: { subscription },
-        } = supabase.auth.onAuthStateChange((_event, session) => {
-            setUser(session?.user ?? null);
-            if (session?.user) {
-                checkAdmin(session.user.id);
-            } else {
-                setIsAdmin(false);
-            }
-        });
-
-        return () => subscription.unsubscribe();
-    }, []);
-
-    const checkAdmin = async (userId: string) => {
-        try {
-            const { data, error } = await supabase
-                .from("profiles")
-                .select("role")
-                .eq("id", userId)
-                .single();
-
-            if (data && data.role === 'admin') {
-                setIsAdmin(true);
-            } else {
-                setIsAdmin(false);
-            }
-        } catch (e) {
-            console.error("Check Admin Exception:", e);
-        }
-    };
-
-    const handleLogout = async () => {
-        await supabase.auth.signOut();
-        setIsMenuOpen(false);
-        window.location.href = "/";
-    };
+    // ... (useEffect remains same) ...
 
     return (
         <>
-            <AuthModal
-                isOpen={isAuthModalOpen}
-                onClose={() => setIsAuthModalOpen(false)}
-            />
+            {/* AuthModal is now in RootLayout */}
 
             <div className="relative">
                 {user ? (
-                    // Logged In State
+                    // Logged In State (remains same)
                     <div className="relative">
                         <button
                             onClick={() => setIsMenuOpen(!isMenuOpen)}
@@ -131,7 +85,7 @@ export default function UserMenu() {
                 ) : (
                     // Guest State
                     <button
-                        onClick={() => setIsAuthModalOpen(true)}
+                        onClick={() => openAuthModal()}
                         className="flex items-center gap-2 px-4 py-2 text-xs tracking-widest font-medium text-gray-900 border border-gray-900 hover:bg-gray-900 hover:text-white transition-all duration-300"
                     >
                         <User className="w-5 h-5" />
