@@ -1,32 +1,9 @@
-"use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Package, Truck, CheckCircle, Clock, XCircle, Search, ChevronDown, ChevronUp, MapPin } from "lucide-react";
 import Image from "next/image";
-
-interface OrderItem {
-    id: string;
-    coffee: {
-        name: string;
-        image_url: string;
-    };
-    quantity: number;
-    price_at_time: number;
-}
-
-interface Order {
-    id: string;
-    user_id: string;
-    status: string;
-    total_amount: number;
-    recipient_name: string;
-    recipient_phone: string;
-    recipient_address: string;
-    created_at: string;
-    items: OrderItem[];
-    user_email?: string;
-}
+import { Order } from "@/types/index";
 
 export default function AdminOrderTable() {
     const [orders, setOrders] = useState<Order[]>([]);

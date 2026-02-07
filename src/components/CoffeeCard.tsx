@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 // ...
-import { Coffee } from "@/types/coffee";
+import { Coffee } from "@/types/index";
 import { Coffee as CoffeeIcon, ShoppingCart, Check, AlertCircle, MessageSquareText } from "lucide-react";
 import { useCartStore } from "@/lib/CartStore";
 import { useState } from "react";

@@ -1,10 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { Coffee } from '@/types/coffee';
-
-export interface CartItem extends Coffee {
-    quantity: number;
-}
+import { CartItem, Coffee } from '@/types/index';
+import { CHECKOUT_CONFIG } from '@/lib/constants';
 
 interface CartState {
     items: CartItem[];
@@ -19,10 +16,10 @@ interface CartState {
 
     // Getters (computed properties pattern in Zustand)
     getTotalPrice: () => number;
+
+
     getFreeShippingProgress: () => { current: number; threshold: number; remaining: number; progress: number };
 }
-
-const FREE_SHIPPING_THRESHOLD = 3000;
 
 export const useCartStore = create<CartState>()(
     persist(
@@ -79,11 +76,12 @@ export const useCartStore = create<CartState>()(
 
             getFreeShippingProgress: () => {
                 const total = get().getTotalPrice();
+                const threshold = CHECKOUT_CONFIG.FREE_SHIPPING_THRESHOLD;
                 return {
                     current: total,
-                    threshold: FREE_SHIPPING_THRESHOLD,
-                    remaining: Math.max(0, FREE_SHIPPING_THRESHOLD - total),
-                    progress: Math.min(100, (total / FREE_SHIPPING_THRESHOLD) * 100)
+                    threshold: threshold,
+                    remaining: Math.max(0, threshold - total),
+                    progress: Math.min(100, (total / threshold) * 100)
                 };
             }
         }),

@@ -1,7 +1,7 @@
 "use client";
 
 import { Radar, RadarChart, PolarGrid, PolarAngleAxis, ResponsiveContainer } from 'recharts';
-import { Coffee } from '@/types/coffee';
+import { Coffee } from '@/types/index';
 
 interface FlavorRadarProps {
     coffee: Coffee;

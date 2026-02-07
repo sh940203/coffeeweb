@@ -1,4 +1,3 @@
-"use client";
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
@@ -6,21 +5,7 @@ import { Loader2, Plus, Edit, Trash2, Eye, EyeOff, Package, Upload } from "lucid
 import Image from "next/image";
 import ProductModal from "./ProductModal";
 import * as XLSX from 'xlsx';
-
-interface Coffee {
-    id: string;
-    name: string;
-    price_display: string;
-    stock: number;
-    is_available: boolean;
-    image_url: string;
-    origin?: string;
-    roast_level?: string;
-    processing_method?: string; // DB column is 'process' based on setup_full.sql
-    process?: string; // Add this
-    flavor?: string;
-    features?: string;
-}
+import { Coffee } from "@/types/index";
 
 export default function AdminProductTable() {
     const [coffees, setCoffees] = useState<Coffee[]>([]);
