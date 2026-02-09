@@ -1,4 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
+import { createBrowserClient } from '@supabase/ssr'
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
@@ -10,4 +11,8 @@ if (!supabaseUrl || !supabaseKey) {
     )
 }
 
-export const supabase = createClient(supabaseUrl, supabaseKey)
+// Use createBrowserClient on the client to support Cookies (Middleware)
+// Use standard createClient on the server (Stateless/Public Data)
+export const supabase = typeof window !== 'undefined'
+    ? createBrowserClient(supabaseUrl, supabaseKey)
+    : createClient(supabaseUrl, supabaseKey)
