@@ -40,11 +40,16 @@ export default function UserMenu() {
     const checkAdmin = async (userId: string) => {
         try {
             const { data } = await supabase
-                .from('admins') // Assuming you have an 'admins' table
-                .select('user_id')
-                .eq('user_id', userId)
+                .from('profiles')
+                .select('role')
+                .eq('id', userId)
                 .single();
-            setIsAdmin(!!data);
+
+            if (data?.role === 'admin') {
+                setIsAdmin(true);
+            } else {
+                setIsAdmin(false);
+            }
         } catch (error) {
             console.error('Error checking admin status:', error);
             setIsAdmin(false);
