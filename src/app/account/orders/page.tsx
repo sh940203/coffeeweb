@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Calendar, MapPin, Truck, ChevronDown, ChevronUp, CreditCard } from "lucide-react";
+import { ShoppingBag, Calendar, MapPin, Truck, ChevronDown, ChevronUp, CreditCard, ArrowRight } from "lucide-react";
 
 interface OrderItem {
     id: string;
@@ -207,7 +207,7 @@ export default function MyOrdersPage() {
                                                 {order.payment_method && (
                                                     <span className="flex items-center gap-1 text-gray-600">
                                                         <CreditCard className="w-3 h-3" />
-                                                        {order.payment_method === 'ECPAY' ? '綠界支付' : order.payment_method === 'ATM' ? 'ATM轉帳' : order.payment_method}
+                                                        {order.payment_method === 'ECPAY' ? '綠界支付 (信用卡/ATM)' : order.payment_method === 'ATM' ? '匯款轉帳' : order.payment_method === 'cod' ? '匯款或是信用卡付款' : order.payment_method}
                                                     </span>
                                                 )}
                                             </div>
@@ -252,7 +252,35 @@ export default function MyOrdersPage() {
                                                 </div>
                                             </div>
                                             <div>
-                                                {/* Future: Payment info or Tracking number */}
+                                                {/* Payment Info Block */}
+                                                {order.status === 'pending' && order.payment_method === 'ATM' && (
+                                                    <div className="bg-blue-50 border border-blue-100 rounded-sm p-4 text-sm text-blue-900 mb-4">
+                                                        <h5 className="font-bold mb-2 flex items-center gap-2">
+                                                            <CreditCard className="w-4 h-4" />
+                                                            匯款資訊
+                                                        </h5>
+                                                        <p>銀行代碼：<span className="font-mono font-bold">822 (中國信託)</span></p>
+                                                        <p>匯款帳號：<span className="font-mono font-bold">9015-4033-2201</span></p>
+                                                        <p className="text-xs mt-2 text-blue-700">請於 3 日內完成匯款，並通知客服後五碼。</p>
+                                                    </div>
+                                                )}
+
+                                                {order.status === 'pending' && order.payment_method === 'ECPAY' && (
+                                                    <div className="bg-green-50 border border-green-100 rounded-sm p-4 text-sm text-green-900 mb-4">
+                                                        <h5 className="font-bold mb-2 flex items-center gap-2">
+                                                            <CreditCard className="w-4 h-4" />
+                                                            付款狀態：未付款
+                                                        </h5>
+                                                        <p className="mb-3">您的訂單尚未完成付款，請點擊下方按鈕進行支付。</p>
+                                                        <button
+                                                            onClick={(e) => handlePayNow(order, e)}
+                                                            className="w-full py-2 bg-green-600 text-white rounded-sm hover:bg-green-700 transition-colors shadow-sm font-medium tracking-wide flex items-center justify-center gap-2"
+                                                        >
+                                                            前往綠界支付
+                                                            <ArrowRight className="w-4 h-4" />
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
 
