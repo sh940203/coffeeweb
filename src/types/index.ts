@@ -43,6 +43,7 @@ export interface Order {
     created_at: string;
     items: OrderItem[];
     user_email?: string;
+    payment_method?: string;
 }
 
 // Cart Types (derived from Coffee but with quantity)

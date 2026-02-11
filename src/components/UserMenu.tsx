@@ -112,6 +112,15 @@ export default function UserMenu() {
                                     )}
 
                                     <Link
+                                        href="/account/profile"
+                                        className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full text-left"
+                                        onClick={() => setIsMenuOpen(false)}
+                                    >
+                                        <User className="w-5 h-5" />
+                                        個人資料
+                                    </Link>
+
+                                    <Link
                                         href="/account/orders"
                                         className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors w-full text-left"
                                         onClick={() => setIsMenuOpen(false)}

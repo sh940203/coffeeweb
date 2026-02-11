@@ -157,7 +157,8 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
                 p_recipient_name: formData.name,
                 p_recipient_phone: formData.phone,
                 p_recipient_address: finalAddress + (formData.note ? ` (備註: ${formData.note})` : ""),
-                p_items: orderItems
+                p_items: orderItems,
+                p_payment_method: paymentMethod
             });
 
             if (error) throw error;

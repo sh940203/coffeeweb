@@ -5,7 +5,7 @@ import { supabase } from "@/lib/supabase";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
-import { ShoppingBag, Calendar, MapPin, Truck, ChevronDown, ChevronUp } from "lucide-react";
+import { ShoppingBag, Calendar, MapPin, Truck, ChevronDown, ChevronUp, CreditCard } from "lucide-react";
 
 interface OrderItem {
     id: string;
@@ -26,6 +26,7 @@ interface Order {
     recipient_phone: string;
     recipient_address: string;
     items: OrderItem[]; // We will fetch this separately or via join
+    payment_method?: string;
 }
 
 export default function MyOrdersPage() {
@@ -103,6 +104,47 @@ export default function MyOrdersPage() {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
     };
 
+    const handlePayNow = async (order: Order, e: React.MouseEvent) => {
+        e.stopPropagation(); // Prevent toggling expand
+        if (!confirm("即將前往綠界支付頁面進行付款？")) return;
+
+        try {
+            // Call internal API to sign data
+            const res = await fetch('/api/ecpay', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    orderId: order.id,
+                    amount: order.total_amount,
+                    itemName: "Coffee Order (補款)",
+                })
+            });
+
+            if (!res.ok) throw new Error("Failed to prepare ECPay payment");
+
+            const ecpayData = await res.json();
+
+            // Create form and submit
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = ecpayData.action;
+
+            for (const [key, value] of Object.entries(ecpayData.params)) {
+                const input = document.createElement('input');
+                input.type = 'hidden';
+                input.name = key;
+                input.value = value as string;
+                form.appendChild(input);
+            }
+
+            document.body.appendChild(form);
+            form.submit();
+        } catch (error) {
+            console.error("Payment redirect failed:", error);
+            alert("前往付款失敗，請稍後再試。");
+        }
+    };
+
     return (
         <div className="min-h-screen flex flex-col bg-[#F9F9F9]">
             <Navbar />
@@ -161,6 +203,12 @@ export default function MyOrdersPage() {
                                                     <ShoppingBag className="w-3 h-3" />
                                                     {order.items.length} 件商品
                                                 </span>
+                                                {order.payment_method && (
+                                                    <span className="flex items-center gap-1 text-gray-600">
+                                                        <CreditCard className="w-3 h-3" />
+                                                        {order.payment_method === 'ECPAY' ? '綠界支付' : order.payment_method === 'ATM' ? 'ATM轉帳' : order.payment_method}
+                                                    </span>
+                                                )}
                                             </div>
                                         </div>
 
@@ -169,7 +217,15 @@ export default function MyOrdersPage() {
                                                 <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">訂單金額</p>
                                                 <p className="text-lg font-medium text-gray-900">NT$ {order.total_amount}</p>
                                             </div>
-                                            <div className="text-gray-400">
+                                            <div className="text-gray-400 flex items-center gap-4">
+                                                {order.status === 'pending' && order.payment_method === 'ECPAY' && (
+                                                    <button
+                                                        onClick={(e) => handlePayNow(order, e)}
+                                                        className="px-3 py-1 bg-green-600 text-white text-xs rounded-sm hover:bg-green-700 transition-colors shadow-sm"
+                                                    >
+                                                        前往付款
+                                                    </button>
+                                                )}
                                                 {expandedOrder === order.id ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
                                             </div>
                                         </div>
