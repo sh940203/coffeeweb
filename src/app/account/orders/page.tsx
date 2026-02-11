@@ -27,6 +27,7 @@ interface Order {
     recipient_address: string;
     items: OrderItem[]; // We will fetch this separately or via join
     payment_method?: string;
+    order_number?: string;
 }
 
 export default function MyOrdersPage() {
@@ -184,7 +185,7 @@ export default function MyOrdersPage() {
                                         <div className="space-y-1">
                                             <div className="flex items-center gap-3">
                                                 <span className="font-medium text-gray-900 tracking-wider">
-                                                    #{order.id.slice(0, 8)}
+                                                    #{order.order_number || order.id.slice(0, 8)}
                                                 </span>
                                                 <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.status)}`}>
                                                     {order.status === 'pending' && '處理中'}

@@ -11,6 +11,7 @@ export interface OrderDetail {
     recipient_address: string;
     user_id?: string;
     items?: any[];
+    order_number?: string;
 }
 
 interface CheckoutSuccessModalProps {
@@ -81,7 +82,7 @@ export default function CheckoutSuccessModal({ isOpen, onClose, order }: Checkou
                         </div>
                         <h2 className="text-2xl font-bold text-gray-900">謝謝您！您的訂單已經成立！</h2>
                         <div className="text-gray-500 font-mono">
-                            訂單號碼 <span className="text-gray-900 font-medium">{order.id.slice(0, 8).toUpperCase()}...</span>
+                            訂單號碼 <span className="text-gray-900 font-medium">#{order.order_number || order.id.slice(0, 8).toUpperCase()}</span>
                         </div>
                         {/* Mock Email Message */}
                         <p className="text-sm text-gray-500">

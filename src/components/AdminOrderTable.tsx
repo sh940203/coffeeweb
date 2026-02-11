@@ -136,7 +136,9 @@ export default function AdminOrderTable() {
                                 >
                                     {expandedOrder === order.id ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                                 </button>
-                                <span className="font-mono text-sm text-gray-900">#{order.id.slice(0, 8)}</span>
+                                <span className="font-mono text-sm text-gray-900">
+                                    #{order.order_number || order.id.slice(0, 8)}
+                                </span>
                             </div>
 
                             <div className="col-span-2 mb-1 md:mb-0 text-sm text-gray-600 truncate">
