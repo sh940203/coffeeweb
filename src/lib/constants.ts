@@ -1,5 +1,5 @@
 export const SITE_CONFIG = {
-    name: "家庭手作烘焙咖啡",
+    name: "家庭烘焙咖啡",
     description: "用心烘焙每一顆咖啡豆，帶給您最純粹的風味。",
     url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
 };

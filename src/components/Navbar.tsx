@@ -30,7 +30,7 @@ export default function Navbar() {
                 {/* Left: Brand */}
                 <Link href="/" className="text-xl md:text-2xl font-medium tracking-[0.2em] text-gray-800 hover:text-gray-600 transition-colors flex items-center gap-2">
                     <Coffee className="w-7 h-7 stroke-[1.5]" />
-                    <span>家庭手作</span>
+                    <span>家庭烘焙</span>
                 </Link>
 
                 {/* Center: Navigation Links (Desktop) */}

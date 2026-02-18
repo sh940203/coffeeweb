@@ -38,7 +38,7 @@ export default function HeroSection() {
                         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"
                     )}
                 >
-                    家庭手作
+                    家庭烘焙
                     <span
                         className={cn(
                             "block mt-4 text-2xl md:text-3xl text-gray-500 font-extralight tracking-[0.15em] transition-all duration-1000 delay-500",

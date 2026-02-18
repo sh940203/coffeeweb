@@ -42,7 +42,7 @@ export default function AboutSection() {
 
                         <div className="space-y-6 text-gray-950 leading-relaxed tracking-wide text-lg md:text-xl">
                             <p>
-                                「家庭手作」的故事，始於<span className="font-bold">爸爸對咖啡最純粹的興趣</span>。從最早的探索嘗試，到經歷數次烘焙設備的升級，爸爸在無數次的風味實踐中，逐漸熟成出屬於自己的烘焙哲學。起初只是單純地想與好友分享，沒想到這份真摯的風味在朋友圈中口耳相傳，<span className="font-bold text-black">「以咖啡豆交朋友」</span>便成了我們最溫暖的起點。
+                                「家庭烘焙」的故事，始於<span className="font-bold">爸爸對咖啡最純粹的興趣</span>。從最早的探索嘗試，到經歷數次烘焙設備的升級，爸爸在無數次的風味實踐中，逐漸熟成出屬於自己的烘焙哲學。起初只是單純地想與好友分享，沒想到這份真摯的風味在朋友圈中口耳相傳，<span className="font-bold text-black">「以咖啡豆交朋友」</span>便成了我們最溫暖的起點。
                             </p>
                             <p>
                                 而在這迷人的香氣背後，還有<span className="font-bold">媽媽溫柔而堅定的身影</span>。作為最重要的靈魂助手，從生豆進貨時的<span className="font-bold">嚴格把關</span>、繁瑣的<span className="font-bold">雙重手挑瑕疵</span>，到最後的分類包裝與運送，每一個細節都蘊含著媽媽的細心與堅持。
