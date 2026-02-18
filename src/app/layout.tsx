@@ -12,7 +12,7 @@ const notoSerifTC = Noto_Serif_TC({
 });
 
 export const metadata: Metadata = {
-    title: "家庭手作烘焙咖啡",
+    title: "家庭烘焙咖啡",
     description: "用心烘焙每一顆咖啡豆，帶給您最純粹的風味。",
 };
 

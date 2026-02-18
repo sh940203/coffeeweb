@@ -90,6 +90,15 @@ export default function AdminOrderTable() {
         }
     };
 
+    const getPaymentMethodName = (method?: string) => {
+        switch (method) {
+            case 'ECPAY': return '綠界支付 (信用卡/ATM)';
+            case 'ATM': return '匯款轉帳';
+            case 'cod': return '匯款或是信用卡付款'; // Legacy or specific requirement
+            default: return method || '未知';
+        }
+    };
+
     if (loading) return <div className="text-center py-10 text-gray-400">載入訂單中...</div>;
 
     return (
@@ -117,8 +126,9 @@ export default function AdminOrderTable() {
             <div className="hidden md:grid grid-cols-12 gap-4 px-6 py-3 bg-gray-50 border-b border-gray-200 text-xs font-medium text-gray-500 uppercase tracking-wider">
                 <div className="col-span-2">訂單編號</div>
                 <div className="col-span-2">顧客</div>
-                <div className="col-span-2">金額</div>
-                <div className="col-span-2">狀態</div>
+                <div className="col-span-1">金額</div>
+                <div className="col-span-2">付款方式</div>
+                <div className="col-span-1">狀態</div>
                 <div className="col-span-2">收件人</div>
                 <div className="col-span-2 text-right">操作</div>
             </div>
@@ -145,11 +155,17 @@ export default function AdminOrderTable() {
                                 {order.user_email}
                             </div>
 
-                            <div className="col-span-2 mb-1 md:mb-0 text-sm font-medium text-gray-900">
+                            <div className="col-span-1 mb-1 md:mb-0 text-sm font-medium text-gray-900">
                                 NT$ {order.total_amount}
                             </div>
 
-                            <div className="col-span-2 mb-2 md:mb-0">
+                            <div className="col-span-2 mb-1 md:mb-0 text-xs text-gray-600">
+                                <span className="bg-gray-100 px-2 py-1 rounded-sm border border-gray-200">
+                                    {getPaymentMethodName(order.payment_method)}
+                                </span>
+                            </div>
+
+                            <div className="col-span-1 mb-2 md:mb-0">
                                 <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium md:mt-0 ${getStatusColor(order.status)}`}>
                                     {order.status}
                                 </span>
