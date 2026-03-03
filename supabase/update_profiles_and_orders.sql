@@ -7,7 +7,7 @@ ADD COLUMN IF NOT EXISTS phone TEXT,
 ADD COLUMN IF NOT EXISTS address TEXT;
 
 -- 2. Add order_number to orders if it doesn't exist
-ALTER TABLE public.orders 
+ALTER TABLE public.orders
 ADD COLUMN IF NOT EXISTS order_number TEXT UNIQUE;
 
 -- 2. Update handle_checkout function to include payment_method
