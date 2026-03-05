@@ -41,7 +41,7 @@ export default async function Home() {
 
       <main id="shop" className="flex-grow container mx-auto px-6 md:px-12 py-24 w-full max-w-7xl scroll-mt-20">
         <FadeIn delay={0.2} className="mb-16 text-center space-y-4">
-          <h1 className="text-3xl md:text-3xl font-light tracking-[0.2em] text-[#333333]">
+          <h1 className="text-3xl md:text-3xl font-light tracking-[0.2em] text-[#3B2F2F]">
             當季豆單
           </h1>
           <p className="text-xs text-gray-400 tracking-[0.3em] font-light uppercase">

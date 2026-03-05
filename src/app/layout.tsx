@@ -26,7 +26,7 @@ export default function RootLayout({
     return (
         <html lang="zh-TW">
             <body
-                className={`${notoSerifTC.variable} antialiased bg-[#F9F9F9] text-[#333333]`}
+                className={`${notoSerifTC.variable} antialiased bg-[#EDE5DB] text-[#3B2F2F]`}
             >
                 {children}
                 <CartSidebar />

@@ -144,7 +144,7 @@ export default function UserMenu() {
                     // Guest State
                     <button
                         onClick={() => openAuthModal()}
-                        className="flex items-center gap-2 px-4 py-2 text-xs tracking-widest font-medium text-gray-900 border border-gray-900 hover:bg-gray-900 hover:text-white transition-all duration-300"
+                        className="flex items-center gap-2 px-4 py-2 text-xs tracking-widest font-medium text-[#3B2F2F] border border-[#3B2F2F] hover:bg-[#3B2F2F] hover:text-white transition-all duration-300 rounded-full"
                     >
                         <User className="w-5 h-5" />
                         <span>登入 / 註冊</span>

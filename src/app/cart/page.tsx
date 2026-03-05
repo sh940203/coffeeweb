@@ -4,15 +4,40 @@ import { useCartStore } from "@/lib/CartStore";
 import { Trash2, Plus, Minus, ArrowRight, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import CheckoutModal from "@/components/CheckoutModal";
 import CheckoutSuccessModal, { OrderDetail } from "@/components/CheckoutSuccessModal";
 import { supabase } from "@/lib/supabase";
+import { useAuthStore } from "@/lib/AuthStore";
+import { toast } from "sonner";
 
 export default function CartPage() {
     const { items, removeItem, updateQuantity, getTotalPrice, getFreeShippingProgress } = useCartStore();
+    const { openAuthModal } = useAuthStore();
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [successOrder, setSuccessOrder] = useState<OrderDetail | null>(null);
+    const [userId, setUserId] = useState<string | null>(null);
+
+    // 追蹤登入狀態
+    useEffect(() => {
+        supabase.auth.getSession().then(({ data: { session } }) => {
+            setUserId(session?.user?.id ?? null);
+        });
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+            setUserId(session?.user?.id ?? null);
+        });
+        return () => subscription.unsubscribe();
+    }, []);
+
+    // 結帳前檢查登入狀態
+    const handleCheckout = () => {
+        if (!userId) {
+            toast.info("請先登入或註冊帳號才能結帳。");
+            openAuthModal('login');
+            return;
+        }
+        setIsCheckoutOpen(true);
+    };
 
     const totalPrice = getTotalPrice();
     const { progress, remaining: freeShippingDiff } = getFreeShippingProgress();
@@ -148,7 +173,7 @@ export default function CartPage() {
                             </div>
 
                             <button
-                                onClick={() => setIsCheckoutOpen(true)}
+                                onClick={handleCheckout}
                                 className="w-full py-4 bg-gray-900 text-white text-base tracking-widest hover:bg-gray-800 transition-colors shadow-lg flex items-center justify-center gap-2 rounded-sm"
                             >
                                 前往結帳

@@ -9,7 +9,7 @@ import { useCartStore } from "@/lib/CartStore";
 import { useState } from "react";
 import FlavorRadar from "./FlavorRadar";
 import ReviewSection from "./ReviewSection";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import WishlistButton from "./WishlistButton";
 import { toast } from "sonner";
 
@@ -48,9 +48,9 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
 
     return (
         <motion.div
-            whileHover={{ y: -8 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-            className="group flex flex-col h-full bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300"
+            whileHover={{ y: -6, scale: 1.02 }}
+            transition={{ type: "spring", stiffness: 260, damping: 20 }}
+            className="group flex flex-col h-full bg-[#FAF7F4] rounded-sm overflow-hidden shadow-sm hover:shadow-lg transition-shadow duration-500"
         >
             {/* Image Container 4:5 Aspect Ratio */}
             <Link href={`/products/${coffee.id}`} className="block relative w-full aspect-[4/5] bg-gray-100 overflow-hidden cursor-pointer">
@@ -70,7 +70,7 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
 
                 {isOutOfStock && (
                     <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
-                        <span className="bg-gray-800 text-white px-4 py-2 text-sm tracking-widest uppercase">已售罄</span>
+                        <span className="bg-[#3B2F2F] text-white px-4 py-2 text-sm tracking-widest uppercase">已售罄</span>
                     </div>
                 )}
 
@@ -82,7 +82,7 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
             {/* Content */}
             <div className="flex flex-col flex-grow p-6 text-center">
                 <Link href={`/products/${coffee.id}`}>
-                    <h3 className="text-lg font-medium tracking-wide text-gray-900 mb-2 hover:text-gray-600 transition-colors cursor-pointer">{coffee.name}</h3>
+                    <h3 className="text-lg font-medium tracking-wide text-[#3B2F2F] mb-2 hover:text-[#6B5B4E] transition-colors cursor-pointer">{coffee.name}</h3>
                 </Link>
 
                 <div className="text-xs text-gray-500 tracking-wider uppercase mb-4 space-x-2">
@@ -149,27 +149,42 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
                                 </button>
                             </div>
 
-                            {/* Add Button */}
-                            <button
+                            {/* Add Button — 點擊回饋動畫 */}
+                            <motion.button
                                 onClick={handleAddToCart}
                                 disabled={added}
-                                className={`flex-1 inline-flex items-center justify-center gap-2 py-3 text-sm tracking-widest transition-all duration-300 ${added
+                                whileTap={{ scale: 0.95 }}
+                                className={`flex-1 inline-flex items-center justify-center gap-2 py-3 text-sm tracking-widest transition-colors duration-300 ${added
                                     ? 'bg-green-600 text-white hover:bg-green-700'
-                                    : 'bg-gray-900 text-white hover:bg-gray-700'
+                                    : 'bg-[#3B2F2F] text-white hover:bg-[#5A4A3E]'
                                     }`}
                             >
-                                {added ? (
-                                    <>
-                                        <Check className="w-4 h-4" />
-                                        <span>已加入</span>
-                                    </>
-                                ) : (
-                                    <>
-                                        <ShoppingCart className="w-4 h-4" />
-                                        <span>加入</span>
-                                    </>
-                                )}
-                            </button>
+                                <AnimatePresence mode="wait">
+                                    {added ? (
+                                        <motion.span
+                                            key="added"
+                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.5 }}
+                                            className="inline-flex items-center gap-2"
+                                        >
+                                            <Check className="w-4 h-4" />
+                                            <span>已加入</span>
+                                        </motion.span>
+                                    ) : (
+                                        <motion.span
+                                            key="add"
+                                            initial={{ opacity: 0, scale: 0.5 }}
+                                            animate={{ opacity: 1, scale: 1 }}
+                                            exit={{ opacity: 0, scale: 0.5 }}
+                                            className="inline-flex items-center gap-2"
+                                        >
+                                            <ShoppingCart className="w-4 h-4" />
+                                            <span>加入</span>
+                                        </motion.span>
+                                    )}
+                                </AnimatePresence>
+                            </motion.button>
                         </div>
                     )}
                 </div>

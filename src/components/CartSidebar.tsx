@@ -8,9 +8,12 @@ import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import CheckoutModal from "./CheckoutModal";
 import CheckoutSuccessModal, { OrderDetail } from "./CheckoutSuccessModal";
+import { useAuthStore } from "@/lib/AuthStore";
+import { toast } from "sonner";
 
 export default function CartSidebar() {
     const { isCartOpen, toggleCart, items, removeItem, updateQuantity, getTotalPrice, getFreeShippingProgress, clearCart } = useCartStore();
+    const { openAuthModal } = useAuthStore();
     const [userId, setUserId] = useState<string | null>(null);
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [successOrder, setSuccessOrder] = useState<OrderDetail | null>(null);
@@ -65,6 +68,17 @@ export default function CartSidebar() {
 
     const handleOrderSuccess = (order: OrderDetail) => {
         setSuccessOrder(order);
+    };
+
+    // 結帳前檢查登入狀態
+    const handleGoToCheckout = () => {
+        if (!userId) {
+            toast.info("請先登入或註冊帳號才能結帳。");
+            openAuthModal('login');
+            toggleCart(); // 關閉購物車側欄
+            return;
+        }
+        toggleCart(); // 關閉側欄
     };
 
     return (
@@ -198,14 +212,24 @@ export default function CartSidebar() {
                                     <span className="text-green-600 font-medium">已達免運門檻</span>
                                 )}
                             </div>
-                            <Link
-                                href="/cart"
-                                onClick={toggleCart} // Close sidebar when navigating
-                                className="w-full flex items-center justify-center gap-2 rounded-sm border border-transparent bg-gray-900 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-all active:scale-[0.98]"
-                            >
-                                前往購物車確認
-                                <ArrowRight className="w-4 h-4" />
-                            </Link>
+                            {userId ? (
+                                <Link
+                                    href="/cart"
+                                    onClick={toggleCart}
+                                    className="w-full flex items-center justify-center gap-2 rounded-sm border border-transparent bg-gray-900 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-all active:scale-[0.98]"
+                                >
+                                    前往購物車確認
+                                    <ArrowRight className="w-4 h-4" />
+                                </Link>
+                            ) : (
+                                <button
+                                    onClick={handleGoToCheckout}
+                                    className="w-full flex items-center justify-center gap-2 rounded-sm border border-transparent bg-gray-900 px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-gray-800 transition-all active:scale-[0.98]"
+                                >
+                                    登入後結帳
+                                    <ArrowRight className="w-4 h-4" />
+                                </button>
+                            )}
                             <div className="flex justify-center">
                                 <button
                                     type="button"
