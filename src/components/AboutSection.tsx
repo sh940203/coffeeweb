@@ -3,7 +3,8 @@
 import Image from "next/image";
 import { Coffee, Award, Heart } from "lucide-react";
 import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
+import { useSettingsStore } from "@/lib/SettingsStore";
 
 /* ── 交錯進場動畫設定 ── */
 const containerVariants = {
@@ -31,6 +32,16 @@ const fadeUp = {
 export default function AboutSection() {
     const sectionRef = useRef<HTMLElement>(null);
     const isInView = useInView(sectionRef, { once: true, margin: "-100px" });
+    const { about, load } = useSettingsStore();
+
+    useEffect(() => {
+        load();
+    }, [load]);
+
+    // 後台自訂內容：以空行分段；未設定則沿用預設故事
+    const customParagraphs = about?.body?.trim()
+        ? about.body.trim().split(/\n\s*\n/).map((p) => p.trim()).filter(Boolean)
+        : null;
 
     return (
         <section id="about" className="py-24 bg-[#F5EDE4]" ref={sectionRef}>
@@ -77,15 +88,21 @@ export default function AboutSection() {
                         </div>
 
                         <div className="space-y-6 text-[#3B2F2F] leading-relaxed tracking-wide text-lg md:text-xl">
-                            <p>
-                                「家庭烘焙」的故事，始於<span className="font-bold">爸爸對咖啡最純粹的興趣</span>。從最早的探索嘗試，到經歷數次烘焙設備的升級，爸爸在無數次的風味實踐中，逐漸熟成出屬於自己的烘焙哲學。起初只是單純地想與好友分享，沒想到這份真摯的風味在朋友圈中口耳相傳，<span className="font-bold text-black">「以咖啡豆交朋友」</span>便成了我們最溫暖的起點。
-                            </p>
-                            <p>
-                                而在這迷人的香氣背後，還有<span className="font-bold">媽媽溫柔而堅定的身影</span>。作為最重要的靈魂助手，從生豆進貨時的<span className="font-bold">嚴格把關</span>、繁瑣的<span className="font-bold">雙重手挑瑕疵</span>，到最後的分類包裝與運送，每一個細節都蘊含著媽媽的細心與堅持。
-                            </p>
-                            <p>
-                                我們是一個由<span className="font-bold text-black">爸爸掌爐、媽媽守護</span>的家庭式烘焙室。這裡沒有商業量產的冰冷，只有我們對每一顆豆子的珍視。我們堅持<span className="font-bold">小批次新鮮烘焙</span>，將這份來自「家」的溫度與專業，傳遞到您手中的每一杯咖啡裡。
-                            </p>
+                            {customParagraphs ? (
+                                customParagraphs.map((p, i) => <p key={i}>{p}</p>)
+                            ) : (
+                                <>
+                                    <p>
+                                        「家庭烘焙」的故事，始於<span className="font-bold">爸爸對咖啡最純粹的興趣</span>。從最早的探索嘗試，到經歷數次烘焙設備的升級，爸爸在無數次的風味實踐中，逐漸熟成出屬於自己的烘焙哲學。起初只是單純地想與好友分享，沒想到這份真摯的風味在朋友圈中口耳相傳，<span className="font-bold text-black">「以咖啡豆交朋友」</span>便成了我們最溫暖的起點。
+                                    </p>
+                                    <p>
+                                        而在這迷人的香氣背後，還有<span className="font-bold">媽媽溫柔而堅定的身影</span>。作為最重要的靈魂助手，從生豆進貨時的<span className="font-bold">嚴格把關</span>、繁瑣的<span className="font-bold">雙重手挑瑕疵</span>，到最後的分類包裝與運送，每一個細節都蘊含著媽媽的細心與堅持。
+                                    </p>
+                                    <p>
+                                        我們是一個由<span className="font-bold text-black">爸爸掌爐、媽媽守護</span>的家庭式烘焙室。這裡沒有商業量產的冰冷，只有我們對每一顆豆子的珍視。我們堅持<span className="font-bold">小批次新鮮烘焙</span>，將這份來自「家」的溫度與專業，傳遞到您手中的每一杯咖啡裡。
+                                    </p>
+                                </>
+                            )}
                         </div>
 
                         {/* Features / Icons — 依序交錯進場 */}

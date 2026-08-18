@@ -75,11 +75,10 @@ export default function ProfilePage() {
 
             if (error) throw error;
 
-            // Show success message (using alert for now if sonner not available, but I saw sonner in package.json)
-            alert("儲存成功！");
+            toast.success("個人資料已儲存");
         } catch (error) {
             console.error("Error saving profile:", error);
-            alert("儲存失敗，請稍後再試。");
+            toast.error("儲存失敗，請稍後再試。");
         } finally {
             setSaving(false);
         }
@@ -98,7 +97,7 @@ export default function ProfilePage() {
             <Navbar />
             <div className="flex-grow pt-32 pb-20 container mx-auto px-6 md:px-12 max-w-2xl">
                 <div className="mb-10 text-center">
-                    <h1 className="text-3xl font-light tracking-[0.2em] text-[#333333] mb-2">
+                    <h1 className="text-3xl font-light tracking-[0.2em] text-[#3B2F2F] mb-2">
                         個人資料
                     </h1>
                     <p className="text-xs text-gray-400 tracking-[0.3em] uppercase">
@@ -134,7 +133,7 @@ export default function ProfilePage() {
                                 value={profile.full_name}
                                 onChange={(e) => setProfile({ ...profile, full_name: e.target.value })}
                                 placeholder="請輸入您的姓名"
-                                className="w-full px-4 py-3 border border-gray-200 rounded-sm focus:ring-1 focus:ring-gray-900 focus:border-gray-900 outline-none transition-all"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-sm focus:ring-1 focus:ring-[#C4A882] focus:border-[#C4A882] outline-none transition-all"
                             />
                         </div>
 
@@ -149,7 +148,7 @@ export default function ProfilePage() {
                                 value={profile.phone}
                                 onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
                                 placeholder="09xx-xxx-xxx"
-                                className="w-full px-4 py-3 border border-gray-200 rounded-sm focus:ring-1 focus:ring-gray-900 focus:border-gray-900 outline-none transition-all"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-sm focus:ring-1 focus:ring-[#C4A882] focus:border-[#C4A882] outline-none transition-all"
                             />
                         </div>
 
@@ -164,7 +163,7 @@ export default function ProfilePage() {
                                 onChange={(e) => setProfile({ ...profile, address: e.target.value })}
                                 placeholder="請輸入您的收件地址"
                                 rows={3}
-                                className="w-full px-4 py-3 border border-gray-200 rounded-sm focus:ring-1 focus:ring-gray-900 focus:border-gray-900 outline-none transition-all resize-none"
+                                className="w-full px-4 py-3 border border-gray-200 rounded-sm focus:ring-1 focus:ring-[#C4A882] focus:border-[#C4A882] outline-none transition-all resize-none"
                             />
                         </div>
 
@@ -172,7 +171,7 @@ export default function ProfilePage() {
                             <button
                                 type="submit"
                                 disabled={saving}
-                                className="w-full bg-gray-900 text-white py-3 rounded-sm text-sm tracking-widest font-medium hover:bg-gray-800 transition-all flex items-center justify-center gap-2 disabled:bg-gray-400"
+                                className="w-full bg-[#3B2F2F] text-white py-3 rounded-sm text-sm tracking-widest font-medium hover:bg-[#5A4A3E] transition-all flex items-center justify-center gap-2 disabled:bg-gray-400"
                             >
                                 {saving ? (
                                     <>

@@ -16,6 +16,7 @@ export interface ModalCoffee {
     price_display?: string;
     stock: number;
     image_url?: string;
+    myship_url?: string;
     is_available: boolean;
 }
 
@@ -39,6 +40,7 @@ export default function ProductModal({ isOpen, onClose, coffee, onSave }: Produc
         price_display: "NT$ 450",
         stock: 10,
         image_url: "",
+        myship_url: "",
         is_available: true
     });
 
@@ -54,7 +56,8 @@ export default function ProductModal({ isOpen, onClose, coffee, onSave }: Produc
                     flavor: coffee.flavor || "",
                     features: coffee.features || "",
                     price_display: coffee.price_display || "NT$ ",
-                    image_url: coffee.image_url || ""
+                    image_url: coffee.image_url || "",
+                    myship_url: coffee.myship_url || ""
                 });
             } else {
                 setFormData({
@@ -67,6 +70,7 @@ export default function ProductModal({ isOpen, onClose, coffee, onSave }: Produc
                     price_display: "NT$ ",
                     stock: 10,
                     image_url: "",
+                    myship_url: "",
                     is_available: true
                 });
             }
@@ -96,8 +100,11 @@ export default function ProductModal({ isOpen, onClose, coffee, onSave }: Produc
                 flavor: formData.flavor,
                 features: formData.features,
                 price_display: formData.price_display, // Ensure format?
+                // 同步數值價格：結帳時伺服器以 coffees.price 計算，必須與顯示價一致
+                price: Number(formData.price_display?.replace(/\D/g, '') || 0),
                 stock: Number(formData.stock),
                 image_url: formData.image_url,
+                myship_url: formData.myship_url,
                 is_available: formData.is_available
             };
 
@@ -284,6 +291,20 @@ export default function ProductModal({ isOpen, onClose, coffee, onSave }: Produc
                                 placeholder="G1 等級 / 冠軍豆"
                                 className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none"
                             />
+                        </div>
+
+                        {/* 賣貨便連結 */}
+                        <div className="col-span-full">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">7-11 賣貨便連結</label>
+                            <input
+                                type="url"
+                                name="myship_url"
+                                value={formData.myship_url}
+                                onChange={handleChange}
+                                placeholder="https://myship.7-11.com.tw/general/detail/..."
+                                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-gray-900 focus:border-transparent outline-none text-gray-600"
+                            />
+                            <p className="text-xs text-gray-500 mt-1">客戶下單後，結帳成功頁會顯示此連結，引導他到 7-11 賣貨便選店付款。</p>
                         </div>
 
                         {/* Flavor */}

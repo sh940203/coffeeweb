@@ -3,8 +3,9 @@
 import { useCartStore } from "@/lib/CartStore";
 import { ShoppingCart } from "lucide-react";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
-export default function CartTrigger() {
+export default function CartTrigger({ scrolled = true }: { scrolled?: boolean }) {
     const { toggleCart, items } = useCartStore();
     const [mounted, setMounted] = useState(false);
 
@@ -17,7 +18,10 @@ export default function CartTrigger() {
     return (
         <button
             onClick={toggleCart}
-            className="relative p-2 text-[#6B5B4E] hover:text-[#3B2F2F] transition-colors"
+            className={cn(
+                "relative p-2 transition-colors",
+                scrolled ? "text-[#6B5B4E] hover:text-[#3B2F2F]" : "text-white hover:text-white/80 drop-shadow-md"
+            )}
         >
             <ShoppingCart className="w-7 h-7 stroke-1" />
             {count > 0 && (

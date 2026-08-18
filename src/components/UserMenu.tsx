@@ -5,8 +5,9 @@ import { supabase } from "@/lib/supabase";
 import { User, LogOut, LayoutDashboard, ShoppingBag } from "lucide-react";
 import Link from "next/link";
 import { useAuthStore } from "@/lib/AuthStore";
+import { cn } from "@/lib/utils";
 
-export default function UserMenu() {
+export default function UserMenu({ scrolled = true }: { scrolled?: boolean }) {
     const [user, setUser] = useState<any>(null);
     const [isAdmin, setIsAdmin] = useState(false);
     // Removed local isAuthModalOpen
@@ -82,7 +83,10 @@ export default function UserMenu() {
                                 </div>
                                 <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-white rounded-full"></div>
                             </div>
-                            <span className="text-xs font-medium text-gray-700 max-w-[100px] truncate">
+                            <span className={cn(
+                                "text-xs font-medium max-w-[100px] truncate",
+                                scrolled ? "text-gray-700" : "text-white drop-shadow-md"
+                            )}>
                                 {user.user_metadata?.full_name || user.email?.split('@')[0]}
                             </span>
                         </button>
@@ -144,7 +148,12 @@ export default function UserMenu() {
                     // Guest State
                     <button
                         onClick={() => openAuthModal()}
-                        className="flex items-center gap-2 px-4 py-2 text-xs tracking-widest font-medium text-[#3B2F2F] border border-[#3B2F2F] hover:bg-[#3B2F2F] hover:text-white transition-all duration-300 rounded-full"
+                        className={cn(
+                            "flex items-center gap-2 px-4 py-2 text-xs tracking-widest font-medium border transition-all duration-300 rounded-full",
+                            scrolled
+                                ? "text-[#3B2F2F] border-[#3B2F2F] hover:bg-[#3B2F2F] hover:text-white"
+                                : "text-white border-white/70 hover:bg-white hover:text-[#3B2F2F] drop-shadow-md backdrop-blur-sm"
+                        )}
                     >
                         <User className="w-5 h-5" />
                         <span>登入 / 註冊</span>

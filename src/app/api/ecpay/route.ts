@@ -1,65 +1,7 @@
-
 import { NextRequest, NextResponse } from 'next/server';
-import crypto from 'crypto';
+import { ECPAY_CONFIG, ECPayParams, generateCheckMacValue } from '@/lib/ecpay';
 
-// ECPay Stage (Test) Credentials
-const MERCHANT_ID = "2000132";
-const HASH_KEY = "5294y06JbISpM5x9";
-const HASH_IV = "v77hoKGq4kWxNNIS";
-const ECPAY_URL = "https://payment-stage.ecpay.com.tw/Cashier/AioCheckOut/V5";
-
-// Interface for ECPay Parameters
-interface ECPayParams {
-    MerchantID: string;
-    MerchantTradeNo: string;
-    MerchantTradeDate: string;
-    PaymentType: string;
-    TotalAmount: number;
-    TradeDesc: string;
-    ItemName: string;
-    ReturnURL: string;
-    ChoosePayment: string;
-    EncryptType: number;
-    ClientBackURL?: string;
-    OrderResultURL?: string;
-    [key: string]: string | number | undefined;
-}
-
-// Function to generate CheckMacValue
-function generateCheckMacValue(params: ECPayParams): string {
-    // 1. Filter out CheckMacValue itself if present and sort keys
-    const keys = Object.keys(params).filter(k => k !== 'CheckMacValue').sort();
-
-    // 2. Concatenate into query string format
-    let raw = keys.map(k => `${k}=${params[k]}`).join('&');
-
-    // 3. Add HashKey and HashIV
-    raw = `HashKey=${HASH_KEY}&${raw}&HashIV=${HASH_IV}`;
-
-    // 4. URL Encode
-    let encoded = encodeURIComponent(raw).toLowerCase();
-
-    // 5. Replace special characters as per ECPay specs
-    // Note: JS encodeURIComponent differs slightly from .NET/PHP logic ECPay expects
-    // We need to fix specific characters to match ECPay's requirement
-    encoded = encoded
-        .replace(/%2d/g, '-')
-        .replace(/%5f/g, '_')
-        .replace(/%2e/g, '.')
-        .replace(/%21/g, '!')
-        .replace(/%2a/g, '*')
-        .replace(/%28/g, '(')
-        .replace(/%29/g, ')')
-        .replace(/%20/g, '+');
-
-    // 6. SHA256 Encryption
-    const shasum = crypto.createHash('sha256');
-    shasum.update(encoded);
-    const hash = shasum.digest('hex');
-
-    // 7. Uppercase
-    return hash.toUpperCase();
-}
+const { MERCHANT_ID, CHECKOUT_URL: ECPAY_URL } = ECPAY_CONFIG;
 
 export async function POST(req: NextRequest) {
     try {

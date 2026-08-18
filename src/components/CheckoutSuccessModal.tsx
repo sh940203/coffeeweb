@@ -90,6 +90,42 @@ export default function CheckoutSuccessModal({ isOpen, onClose, order }: Checkou
                         </p>
                     </div>
 
+                    {/* 賣貨便付款連結 */}
+                    {order.items && order.items.length > 0 && (
+                        <section className="bg-[#FAF7F4] border border-[#E5D9CC] rounded-lg p-5">
+                            <h3 className="text-sm font-bold text-[#3B2F2F] mb-1 flex items-center gap-2">
+                                <Truck className="w-4 h-4" /> 完成取貨與付款
+                            </h3>
+                            <p className="text-xs text-gray-500 mb-4">
+                                請點下方各商品的連結，前往 7-11 賣貨便選擇取貨門市並完成付款。
+                            </p>
+                            <div className="space-y-2">
+                                {order.items.map((item: any) => (
+                                    <div key={item.id} className="flex items-center justify-between gap-3 bg-white rounded-md border border-gray-100 px-3 py-2">
+                                        <span className="text-sm text-gray-800 truncate">
+                                            {item.name} <span className="text-gray-400">×{item.quantity}</span>
+                                        </span>
+                                        {item.myship_url ? (
+                                            <a
+                                                href={item.myship_url}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex-shrink-0 inline-flex items-center gap-1.5 bg-[#3B2F2F] text-white text-xs tracking-wider px-3 py-2 rounded-md hover:bg-[#5A4A3E] transition-colors"
+                                            >
+                                                前往 7-11 賣貨便付款
+                                                <ExternalLink className="w-3.5 h-3.5" />
+                                            </a>
+                                        ) : (
+                                            <span className="flex-shrink-0 text-xs text-amber-600">
+                                                此商品將由賣家另行通知取貨方式
+                                            </span>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
                     {/* Order Info Grid */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 

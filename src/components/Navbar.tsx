@@ -4,17 +4,28 @@ import Link from "next/link";
 import { Coffee, Menu, X } from "lucide-react";
 import CartTrigger from "./CartTrigger";
 import UserMenu from "./UserMenu";
+import AnnouncementBar from "./AnnouncementBar";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
 import { motion, AnimatePresence } from "framer-motion";
+import { useSettingsStore } from "@/lib/SettingsStore";
 
 /* ── 導覽列連結元件（含底線動畫）── */
-function NavLink({ href, children }: { href: string; children: React.ReactNode }) {
+function NavLink({ href, children, scrolled }: { href: string; children: React.ReactNode; scrolled: boolean }) {
     return (
-        <Link href={href} className="relative py-1 hover:text-[#3B2F2F] transition-colors group">
+        <Link
+            href={href}
+            className={cn(
+                "relative py-1 transition-colors group",
+                scrolled ? "hover:text-[#3B2F2F]" : "hover:text-white"
+            )}
+        >
             {children}
             {/* 底線：hover 時從左滑入 */}
-            <span className="absolute left-0 -bottom-1 h-[1.5px] w-0 bg-[#3B2F2F] transition-all duration-300 ease-out group-hover:w-full" />
+            <span className={cn(
+                "absolute left-0 -bottom-1 h-[1.5px] w-0 transition-all duration-300 ease-out group-hover:w-full",
+                scrolled ? "bg-[#3B2F2F]" : "bg-white"
+            )} />
         </Link>
     );
 }
@@ -29,6 +40,8 @@ const mobileMenuVariants = {
 export default function Navbar() {
     const [scrolled, setScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const { announcement } = useSettingsStore();
+    const barVisible = !!(announcement?.enabled && announcement.text?.trim());
 
     useEffect(() => {
         const handleScroll = () => {
@@ -39,40 +52,52 @@ export default function Navbar() {
     }, []);
 
     return (
+        <>
+        <AnnouncementBar />
         <motion.nav
             className={cn(
-                "fixed top-0 left-0 right-0 z-40 border-b border-transparent transition-colors duration-300",
+                "fixed left-0 right-0 z-40 border-b border-transparent transition-colors duration-300",
                 scrolled
                     ? "bg-[#EDE5DB]/80 backdrop-blur-xl backdrop-saturate-150 border-[#D8CCBE] shadow-sm"
                     : "bg-transparent"
             )}
+            style={{ top: barVisible ? 36 : 0 }}
             /* Framer Motion 平滑驅動高度（padding）過渡 */
             animate={{ paddingTop: scrolled ? 16 : 32, paddingBottom: scrolled ? 16 : 32 }}
             transition={{ type: "tween", duration: 0.35, ease: "easeInOut" }}
         >
             <div className="container mx-auto px-6 max-w-7xl flex justify-between items-center">
                 {/* Left: Brand */}
-                <Link href="/" className="text-xl md:text-2xl font-medium tracking-[0.2em] text-[#3B2F2F] hover:text-[#6B5B4E] transition-colors flex items-center gap-2">
+                <Link href="/" className={cn(
+                    "text-xl md:text-2xl font-medium tracking-[0.2em] transition-colors flex items-center gap-2",
+                    scrolled ? "text-[#3B2F2F] hover:text-[#6B5B4E]" : "text-white hover:text-white/80 drop-shadow-md"
+                )}>
                     <Coffee className="w-7 h-7 stroke-[1.5]" />
                     <span>家庭烘焙</span>
                 </Link>
 
                 {/* Center: Navigation Links (Desktop) — 底線動畫 */}
-                <div className="hidden md:flex items-center gap-8 text-sm tracking-[0.15em] font-medium text-[#6B5B4E] absolute left-1/2 transform -translate-x-1/2">
-                    <NavLink href="/">首頁</NavLink>
-                    <NavLink href="/#shop">挑選咖啡</NavLink>
-                    <NavLink href="/#about">關於我們</NavLink>
-                    <NavLink href="/account/orders">歷史訂單</NavLink>
+                <div className={cn(
+                    "hidden md:flex items-center gap-8 text-sm tracking-[0.15em] font-medium absolute left-1/2 transform -translate-x-1/2 transition-colors",
+                    scrolled ? "text-[#6B5B4E]" : "text-white drop-shadow-md"
+                )}>
+                    <NavLink href="/" scrolled={scrolled}>首頁</NavLink>
+                    <NavLink href="/#shop" scrolled={scrolled}>挑選咖啡</NavLink>
+                    <NavLink href="/#about" scrolled={scrolled}>關於我們</NavLink>
+                    <NavLink href="/account/orders" scrolled={scrolled}>歷史訂單</NavLink>
                 </div>
 
                 {/* Right: Cart & User & Mobile Menu Toggle */}
                 <div className="flex justify-end items-center gap-4">
-                    <UserMenu />
-                    <CartTrigger />
+                    <UserMenu scrolled={scrolled} />
+                    <CartTrigger scrolled={scrolled} />
 
                     {/* Mobile Menu Button */}
                     <button
-                        className="md:hidden p-2 text-[#6B5B4E] hover:text-[#3B2F2F] transition-colors"
+                        className={cn(
+                            "md:hidden p-2 transition-colors",
+                            scrolled ? "text-[#6B5B4E] hover:text-[#3B2F2F]" : "text-white hover:text-white/80 drop-shadow-md"
+                        )}
                         onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                     >
                         {isMobileMenuOpen ? (
@@ -129,5 +154,6 @@ export default function Navbar() {
                 )}
             </AnimatePresence>
         </motion.nav>
+        </>
     );
 }

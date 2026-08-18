@@ -44,7 +44,11 @@ export interface Order {
     items: OrderItem[];
     user_email?: string;
     payment_method?: string;
+    shipping_method?: string;
     order_number?: string;
+    tracking_number?: string;
+    subtotal_amount?: number;
+    shipping_amount?: number;
 }
 
 // Cart Types (derived from Coffee but with quantity)

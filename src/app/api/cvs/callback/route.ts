@@ -3,30 +3,34 @@ import { NextRequest } from "next/server";
 export async function POST(request: NextRequest) {
     try {
         const data = await request.formData();
-        const storeId = data.get('storeid') || data.get('StoreId') || data.get('CVSStoreID') || '';
-        const storeName = data.get('storename') || data.get('StoreName') || data.get('CVSStoreName') || '';
-        const storeAddress = data.get('storeaddress') || data.get('StoreAddress') || data.get('CVSAddress') || '';
+        const storeInfo = {
+            storeId: (data.get('storeid') || data.get('StoreId') || data.get('CVSStoreID') || '').toString(),
+            storeName: (data.get('storename') || data.get('StoreName') || data.get('CVSStoreName') || '').toString(),
+            storeAddress: (data.get('storeaddress') || data.get('StoreAddress') || data.get('CVSAddress') || '').toString(),
+            source: 'cvs',
+        };
+
+        // 安全序列化：以 JSON 注入並轉義 "<" 防止 </script> 跳脫造成 XSS
+        const safeData = JSON.stringify(storeInfo).replace(/</g, '\\u003c');
 
         // Generate HTML to send data back to parent window
         const html = `
             <!DOCTYPE html>
             <html>
             <head>
+                <meta charset="utf-8" />
                 <title>Store Selection Callback</title>
             </head>
             <body>
                 <script>
-                    const data = {
-                        storeId: '${storeId}',
-                        storeName: '${storeName}',
-                        storeAddress: '${storeAddress}'
-                    };
-                    
+                    const data = ${safeData};
                     if (window.opener) {
                         window.opener.postMessage(data, window.location.origin);
                         window.close();
                     } else {
-                        document.body.innerHTML = '<h3>Selection Complete</h3><p>Store: ${storeName} (${storeId})</p><p>Please close this window and return to checkout.</p>';
+                        const p = document.createElement('p');
+                        p.textContent = 'Store: ' + data.storeName + ' (' + data.storeId + '). Please close this window and return to checkout.';
+                        document.body.appendChild(p);
                     }
                 </script>
                 <div style="text-align:center; padding: 20px;">

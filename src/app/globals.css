@@ -20,3 +20,19 @@ body {
     color: var(--foreground);
     font-family: var(--font-serif), serif;
 }
+/* 公告跑馬燈 */
+.marquee-track {
+    display: inline-block;
+    animation: marquee 22s linear infinite;
+    will-change: transform;
+}
+.marquee-track:hover {
+    animation-play-state: paused;
+}
+@keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+}
+@media (prefers-reduced-motion: reduce) {
+    .marquee-track { animation: none; }
+}

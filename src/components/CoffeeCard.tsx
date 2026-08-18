@@ -68,6 +68,16 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
                     </div>
                 )}
 
+                {/* 底部漸層：增加景深，讓圖片與下方內容銜接更柔順 */}
+                <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-black/25 to-transparent pointer-events-none z-10" />
+
+                {/* 烘焙度標籤 */}
+                {coffee.roast_level && (
+                    <span className="absolute top-3 left-3 z-20 bg-white/85 backdrop-blur-sm text-[#3B2F2F] text-[11px] tracking-wider px-2.5 py-1 rounded-full shadow-sm">
+                        {coffee.roast_level}
+                    </span>
+                )}
+
                 {isOutOfStock && (
                     <div className="absolute inset-0 bg-white/60 flex items-center justify-center z-10">
                         <span className="bg-[#3B2F2F] text-white px-4 py-2 text-sm tracking-widest uppercase">已售罄</span>
@@ -89,8 +99,6 @@ export default function CoffeeCard({ coffee }: CoffeeCardProps) {
                     {coffee.origin && <span>{coffee.origin}</span>}
                     {coffee.process && <span className="text-gray-300">|</span>}
                     {coffee.process && <span>{coffee.process}</span>}
-                    {coffee.roast_level && <span className="text-gray-300">|</span>}
-                    {coffee.roast_level && <span>{coffee.roast_level}</span>}
                 </div>
 
                 {/* Feature & Flavor */}

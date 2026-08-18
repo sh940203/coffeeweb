@@ -87,7 +87,8 @@ export default function AdminProductTable() {
             flavor: c.flavor,
             features: c.features,
             is_available: c.is_available ? 'TRUE' : 'FALSE',
-            image_url: c.image_url
+            image_url: c.image_url,
+            myship_url: c.myship_url
         }));
 
         const wb = XLSX.utils.book_new();
@@ -120,13 +121,16 @@ export default function AdminProductTable() {
                     name: row.name,
                     stock: Number(row.stock || 0),
                     price_display: row.price_display?.toString() || '',
+                    // 同步數值價格（結帳以此為準）
+                    price: Number((row.price_display?.toString() || '').replace(/\D/g, '') || 0),
                     origin: row.origin || '',
                     roast_level: row.roast_level || '',
                     process: row.process || '', // DB column is 'process'
                     flavor: row.flavor || '',
                     features: row.features || '',
                     is_available: row.is_available === 'TRUE' || row.is_available === true,
-                    image_url: row.image_url || ''
+                    image_url: row.image_url || '',
+                    myship_url: row.myship_url || ''
                 };
 
                 // ID check

@@ -165,6 +165,11 @@ export default function CartSidebar() {
                                             <div>
                                                 <h3 className="font-medium text-gray-900 tracking-wide text-lg">{item.name}</h3>
                                                 <p className="text-sm text-gray-500 mt-1">{item.price_display} <span className="text-[10px]">/ 半磅</span></p>
+                                                {item.quantity > 1 && (
+                                                    <p className="text-xs text-gray-400 mt-0.5">
+                                                        小計 NT$ {(parseInt(item.price_display?.replace(/\D/g, '') || "0", 10) * item.quantity).toLocaleString()}
+                                                    </p>
+                                                )}
                                             </div>
 
                                             <div className="flex items-center justify-between mt-2">

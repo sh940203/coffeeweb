@@ -54,16 +54,24 @@ export async function middleware(request: NextRequest) {
         }
     )
 
-    const { data: { session } } = await supabase.auth.getSession()
+    // 使用 getUser()（會向 Supabase 驗證 JWT），而非僅讀 cookie 的 getSession()
+    const { data: { user } } = await supabase.auth.getUser()
 
-    // Protect /admin routes
+    // Protect /admin routes — 伺服器端同時檢查「已登入」與「admin 角色」
     if (request.nextUrl.pathname.startsWith('/admin')) {
-        if (!session) {
+        if (!user) {
             return NextResponse.redirect(new URL('/', request.url))
         }
 
-        // Optional: Check for admin role here if you store role in metadata or a separate table
-        // For now, we trust the page level check for 'role' but this prevents non-logged in access
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single()
+
+        if (profile?.role !== 'admin') {
+            return NextResponse.redirect(new URL('/', request.url))
+        }
     }
 
     return response

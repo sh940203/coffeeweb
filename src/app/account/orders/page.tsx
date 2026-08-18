@@ -6,6 +6,51 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { useRouter } from "next/navigation";
 import { ShoppingBag, Calendar, MapPin, Truck, ChevronDown, ChevronUp, CreditCard, ArrowRight } from "lucide-react";
+import { getOrderStatus, ORDER_FLOW } from "@/lib/constants";
+import { Check } from "lucide-react";
+
+/* 客戶端訂單進度條 — 對應手烘流程 */
+function OrderProgress({ status }: { status: string }) {
+    if (status === 'cancelled') {
+        return (
+            <div className="bg-red-50 border border-red-100 text-red-700 text-sm rounded-md px-4 py-3 mb-6 text-center">
+                此訂單已取消
+            </div>
+        );
+    }
+    const steps = ORDER_FLOW as readonly string[];
+    // paid 視為等同已確認之後的付款狀態，對應到 confirmed 之後
+    const currentIndex = Math.max(0, steps.indexOf(status === 'paid' ? 'confirmed' : status));
+
+    return (
+        <div className="mb-8">
+            <div className="flex items-center">
+                {steps.map((s, i) => {
+                    const done = i < currentIndex;
+                    const active = i === currentIndex;
+                    return (
+                        <div key={s} className="flex items-center flex-1 last:flex-none">
+                            <div className="flex flex-col items-center">
+                                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-medium transition-colors ${done ? 'bg-[#3B2F2F] text-white' :
+                                    active ? 'bg-[#C4A882] text-white ring-4 ring-[#C4A882]/20' :
+                                        'bg-gray-200 text-gray-400'
+                                    }`}>
+                                    {done ? <Check className="w-4 h-4" /> : i + 1}
+                                </div>
+                                <span className={`mt-1.5 text-[11px] whitespace-nowrap ${active ? 'text-[#3B2F2F] font-medium' : 'text-gray-400'}`}>
+                                    {getOrderStatus(s).label}
+                                </span>
+                            </div>
+                            {i < steps.length - 1 && (
+                                <div className={`h-0.5 flex-1 mx-1 -mt-5 transition-colors ${i < currentIndex ? 'bg-[#3B2F2F]' : 'bg-gray-200'}`} />
+                            )}
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
+}
 
 interface OrderItem {
     id: string;
@@ -90,16 +135,7 @@ export default function MyOrdersPage() {
         fetchOrders();
     }, [router]);
 
-    const getStatusColor = (status: string) => {
-        switch (status) {
-            case 'pending': return 'bg-yellow-100 text-yellow-800';
-            case 'paid': return 'bg-blue-100 text-blue-800';
-            case 'shipped': return 'bg-purple-100 text-purple-800';
-            case 'completed': return 'bg-green-100 text-green-800';
-            case 'cancelled': return 'bg-red-100 text-red-800';
-            default: return 'bg-gray-100 text-gray-800';
-        }
-    };
+    const getStatusColor = (status: string) => getOrderStatus(status).color;
 
     const toggleExpand = (orderId: string) => {
         setExpandedOrder(expandedOrder === orderId ? null : orderId);
@@ -188,11 +224,7 @@ export default function MyOrdersPage() {
                                                     #{order.order_number || order.id.slice(0, 8)}
                                                 </span>
                                                 <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.status)}`}>
-                                                    {order.status === 'pending' && '處理中'}
-                                                    {order.status === 'paid' && '已付款'}
-                                                    {order.status === 'shipped' && '已出貨'}
-                                                    {order.status === 'completed' && '已完成'}
-                                                    {order.status === 'cancelled' && '已取消'}
+                                                    {getOrderStatus(order.status).label}
                                                 </span>
                                             </div>
                                             <div className="flex items-center gap-4 text-xs text-gray-500">
@@ -236,6 +268,9 @@ export default function MyOrdersPage() {
                                 {/* Order Details (Collapsible) */}
                                 {expandedOrder === order.id && (
                                     <div className="border-t border-gray-100 bg-gray-50/50 p-6 animate-in slide-in-from-top-2 duration-200">
+                                        {/* 流程進度條 */}
+                                        <OrderProgress status={order.status} />
+
                                         <div className="grid md:grid-cols-2 gap-8 mb-6">
                                             <div>
                                                 <h4 className="text-xs font-medium text-gray-900 uppercase tracking-widest mb-3 flex items-center gap-2">

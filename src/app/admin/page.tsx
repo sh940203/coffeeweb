@@ -7,14 +7,15 @@ import Link from "next/link";
 import AdminMemberTable from "@/components/AdminMemberTable";
 import AdminOrderTable from "@/components/AdminOrderTable";
 import AdminProductTable from "@/components/AdminProductTable";
+import AdminSettings from "@/components/AdminSettings";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Users, ShoppingBag, Package } from "lucide-react";
+import { Users, ShoppingBag, Package, Settings } from "lucide-react";
 
 export default function AdminPage() {
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'members' | 'orders' | 'products'>('orders');
+    const [activeTab, setActiveTab] = useState<'members' | 'orders' | 'products' | 'settings'>('orders');
     const router = useRouter();
 
     useEffect(() => {
@@ -100,6 +101,16 @@ export default function AdminPage() {
                             <Users className="w-4 h-4" />
                             會員列表
                         </button>
+                        <button
+                            onClick={() => setActiveTab('settings')}
+                            className={`flex items-center gap-2 px-6 py-2 text-sm tracking-wider rounded-sm transition-all duration-300 ${activeTab === 'settings'
+                                ? 'bg-gray-900 text-white shadow-md'
+                                : 'text-gray-500 hover:bg-gray-50 hover:text-gray-900'
+                                }`}
+                        >
+                            <Settings className="w-4 h-4" />
+                            網站設定
+                        </button>
                     </div>
                 </div>
 
@@ -107,6 +118,7 @@ export default function AdminPage() {
                     {activeTab === 'orders' && <AdminOrderTable />}
                     {activeTab === 'products' && <AdminProductTable />}
                     {activeTab === 'members' && <AdminMemberTable />}
+                    {activeTab === 'settings' && <AdminSettings />}
                 </div>
             </main>
             <Footer />

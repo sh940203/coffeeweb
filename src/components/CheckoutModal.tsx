@@ -43,6 +43,21 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
         }
     };
 
+    // 運費設定（與後台 app_settings 同步，確保前端顯示與伺服器計算一致）
+    const [shipCfg, setShipCfg] = useState<{ fee: number; free_threshold: number }>({ fee: 60, free_threshold: 3000 });
+
+    useEffect(() => {
+        if (!isOpen) return;
+        supabase
+            .from('app_settings')
+            .select('value')
+            .eq('key', 'shipping')
+            .single()
+            .then(({ data }) => {
+                if (data?.value) setShipCfg(data.value as { fee: number; free_threshold: number });
+            });
+    }, [isOpen]);
+
     // Form Data
     const [shippingMethod, setShippingMethod] = useState<'HOME' | '711' | 'FAMILY'>('HOME');
     const [formData, setFormData] = useState({
@@ -124,7 +139,7 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
     if (!isOpen) return null;
 
     const total = getTotalPrice();
-    const shipping = total >= 2000 ? 0 : 60; // Hardcoded rule for now, sync with store later
+    const shipping = total >= shipCfg.free_threshold ? 0 : shipCfg.fee;
     const grandTotal = total + shipping;
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -135,11 +150,10 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
             // 1. Get current user (if logged in)
             const { data: { user } } = await supabase.auth.getUser();
 
-            // 2. Prepare items for RPC
+            // 2. Prepare items for RPC — 只傳 coffee_id + quantity，價格由伺服器端 (DB) 重算
             const orderItems = items.map(item => ({
                 coffee_id: item.id,
                 quantity: item.quantity,
-                price: parseInt(item.price_display?.replace(/\D/g, '') || "0", 10)
             }));
 
             // Build final address string with method prefix if needed
@@ -150,31 +164,37 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
                 finalAddress = `[全家] ${finalAddress}`;
             }
 
-            // 3. Call RPC
+            // 3. Call RPC（伺服器端計算金額，前端的 grandTotal 僅作對帳）
             const { data, error } = await supabase.rpc('handle_checkout', {
                 p_user_id: user?.id || null, // Allow guest checkout (will be null)
-                p_total_amount: grandTotal,
                 p_recipient_name: formData.name,
                 p_recipient_phone: formData.phone,
                 p_recipient_address: finalAddress + (formData.note ? ` (備註: ${formData.note})` : ""),
                 p_items: orderItems,
-                p_payment_method: paymentMethod
+                p_payment_method: paymentMethod,
+                p_shipping_method: shippingMethod,
+                p_recipient_email: user?.email || null,
+                p_client_total: grandTotal,
             });
 
             if (error) throw error;
             console.log("Order created:", data);
 
+            // 以伺服器端回傳的金額為準（避免任何前端竄改）
+            const serverTotal: number = data?.total ?? grandTotal;
+            const serverOrderNumber: string | undefined = data?.order_number;
+
             // Handle ECPay Logic
             if (paymentMethod === 'ECPAY') {
-                const orderId = data?.order_id || data?.id;
+                const orderId = serverOrderNumber || data?.order_id || data?.id;
 
-                // Call internal API to sign data
+                // Call internal API to sign data（金額用伺服器端計算結果）
                 const res = await fetch('/api/ecpay', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         orderId,
-                        amount: grandTotal,
+                        amount: serverTotal,
                         itemName: "Coffee Order",
                         recipientEmail: user?.email // Optional
                     })
@@ -208,9 +228,9 @@ export default function CheckoutModal({ isOpen, onClose, onSuccess }: CheckoutMo
 
             // 4. Success (ATM / Manual)
             const successOrder: OrderDetail = {
-                id: data?.order_id || data?.id || "ORDER_ID",
+                id: serverOrderNumber || data?.order_id || data?.id || "ORDER_ID",
                 created_at: new Date().toISOString(),
-                total_amount: grandTotal,
+                total_amount: serverTotal,
                 status: 'PENDING',
                 recipient_name: formData.name,
                 recipient_phone: formData.phone,

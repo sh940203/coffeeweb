@@ -17,6 +17,8 @@ export default function CartPage() {
     const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
     const [successOrder, setSuccessOrder] = useState<OrderDetail | null>(null);
     const [userId, setUserId] = useState<string | null>(null);
+    // 運費設定（與後台 app_settings、結帳頁、伺服器計算一致）
+    const [shipCfg, setShipCfg] = useState<{ fee: number; free_threshold: number }>({ fee: 60, free_threshold: 3000 });
 
     // 追蹤登入狀態
     useEffect(() => {
@@ -25,6 +27,9 @@ export default function CartPage() {
         });
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
             setUserId(session?.user?.id ?? null);
+        });
+        supabase.from('app_settings').select('value').eq('key', 'shipping').single().then(({ data }) => {
+            if (data?.value) setShipCfg(data.value as { fee: number; free_threshold: number });
         });
         return () => subscription.unsubscribe();
     }, []);
@@ -41,6 +46,7 @@ export default function CartPage() {
 
     const totalPrice = getTotalPrice();
     const { progress, remaining: freeShippingDiff } = getFreeShippingProgress();
+    const shippingFee = totalPrice >= shipCfg.free_threshold ? 0 : shipCfg.fee;
 
     const handleOrderSuccess = (order: OrderDetail) => {
         setSuccessOrder(order);
@@ -57,7 +63,7 @@ export default function CartPage() {
                     }}
                     order={successOrder}
                 />
-                <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center bg-gray-50">
+                <div className="min-h-screen pt-24 pb-12 flex flex-col items-center justify-center bg-[#F9F9F9]">
                     <div className="bg-white p-12 rounded-lg shadow-sm text-center max-w-md w-full mx-4">
                         <div className="w-20 h-20 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-400">
                             <ArrowLeft className="w-8 h-8" />
@@ -66,7 +72,7 @@ export default function CartPage() {
                         <p className="text-gray-500 mb-8">看起來您還沒有加入任何咖啡豆。</p>
                         <Link
                             href="/"
-                            className="inline-flex items-center justify-center px-8 py-3 bg-gray-900 text-white text-sm tracking-widest hover:bg-gray-800 transition-colors rounded-sm"
+                            className="inline-flex items-center justify-center px-8 py-3 bg-[#3B2F2F] text-white text-sm tracking-widest hover:bg-[#5A4A3E] transition-colors rounded-sm"
                         >
                             前往選購
                         </Link>
@@ -155,8 +161,8 @@ export default function CartPage() {
                                 </div>
                                 <div className="flex justify-between text-gray-600">
                                     <span>運費</span>
-                                    {freeShippingDiff > 0 ? (
-                                        <span>NT$ 100</span> // Assuming standard shipping is 100 if not stated otherwise, actually logic might be in checkout modal
+                                    {shippingFee > 0 ? (
+                                        <span>NT$ {shippingFee}</span>
                                     ) : (
                                         <span className="text-green-600">免運費</span>
                                     )}
@@ -168,13 +174,13 @@ export default function CartPage() {
                                 )}
                                 <div className="pt-4 border-t border-gray-100 flex justify-between text-lg font-medium text-gray-900">
                                     <span>總計</span>
-                                    <span>NT$ {totalPrice + (freeShippingDiff > 0 ? 100 : 0)} </span> {/* Approximate logic, real logic in checkout */}
+                                    <span>NT$ {totalPrice + shippingFee} </span>
                                 </div>
                             </div>
 
                             <button
                                 onClick={handleCheckout}
-                                className="w-full py-4 bg-gray-900 text-white text-base tracking-widest hover:bg-gray-800 transition-colors shadow-lg flex items-center justify-center gap-2 rounded-sm"
+                                className="w-full py-4 bg-[#3B2F2F] text-white text-base tracking-widest hover:bg-[#5A4A3E] transition-colors shadow-lg flex items-center justify-center gap-2 rounded-sm"
                             >
                                 前往結帳
                                 <ArrowRight className="w-4 h-4" />
