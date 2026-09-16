@@ -18,14 +18,14 @@ export default function Footer() {
             <p className="tracking-widest">Copyright © {new Date().getFullYear()} 家庭烘焙咖啡</p>
             <p className="mt-3 text-xs tracking-[0.15em] opacity-80">用心烘焙每一顆咖啡豆</p>
             <p className="mt-5 text-xs tracking-[0.15em]">
-                producer by{" "}
+                Produced by{" "}
                 <a
                     href="https://sh-studio.huhu940203.workers.dev/"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[#6B5B4E] underline underline-offset-4 decoration-[#D8CCBE] hover:text-[#3B2F2F] transition-colors"
                 >
-                    @sh
+                    @SH Studio
                 </a>
             </p>
         </motion.footer>
